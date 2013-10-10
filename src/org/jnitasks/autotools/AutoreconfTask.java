@@ -1,10 +1,9 @@
 package org.jnitasks.autotools;
 
-import java.io.File;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
+import java.io.File;
 
 // TODO Add support for -I, -B  via TaskContainer and DirSet
 public class AutoreconfTask extends Task {

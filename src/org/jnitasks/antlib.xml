@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<antlib>
+    <typedef name="autoreconf" classname="org.jnitasks.autotools.AutoreconfTask" />
+    <typedef name="configure" classname="org.jnitasks.autotools.ConfigureTask" />
+</antlib>

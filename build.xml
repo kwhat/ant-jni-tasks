@@ -24,7 +24,7 @@
 	<!-- Class Path Settings -->
 	<!-- NOTE Gentoo requires `CLASSPATH="$(java-config -p ant-junit,junit-4)" ant test` -->
 	<path id="project.class.path">
-		<!-- pathelement location="${dir.bin}/java" /-->
+		<pathelement location="${dir.bin}" />
 		<!-- pathelement location="${dir.bin}/test" /-->
 		<pathelement location="${dir.jar}" />
 		
@@ -40,11 +40,9 @@
 	</target>
 
 
-	<target name="compile" depends="compile-src,compile-test" description="Compiles Java source files."/>
-
-	<target name="compile-src" description="Compiles Java source files.">
+	<target name="compile" description="Compiles Java source files.">
 		<echo>Compiling Java source...</echo>
-		<mkdir dir="${dir.bin}/java" />
+		<mkdir dir="${dir.bin}" />
 		
 		<javac
 			compiler="${ant.build.javac.compiler}"
@@ -64,33 +62,32 @@
 			<bootclasspath path="${java.bootclasspath}" />
 		</javac>
 	</target>
-	
-	<target name="compile-test" description="Compiles Java source files.">
-		<echo>Compiling JUnit source...</echo>
-		<mkdir dir="${dir.bin}/test" />
-
-		<javac
-			compiler="${ant.build.javac.compiler}"
-			destdir="${dir.bin}"
-			debug="${ant.build.debug}"
-			debuglevel="lines,vars,source"
-			optimize="${project.optimize}"
-			deprecation="false"
-			includeantruntime="false"
-			listfiles="true"
-			verbose="false"
-		>
-			<src path="${dir.test}" />
-
-			<classpath refid="project.class.path" />
-			<bootclasspath path="${java.bootclasspath}" />
-
-			<compilerarg value="-Xlint:unchecked" />
-		</javac>
-	</target>
 
 
-	<target name="test" depends="compile-test" description="Perform JUnit tests.">
+	<target name="test" description="Perform JUnit tests.">
+        <echo>Compiling JUnit source...</echo>
+        <mkdir dir="${dir.bin}" />
+
+        <javac
+                compiler="${ant.build.javac.compiler}"
+                destdir="${dir.bin}"
+                debug="${ant.build.debug}"
+                debuglevel="lines,vars,source"
+                optimize="${project.optimize}"
+                deprecation="false"
+                includeantruntime="false"
+                listfiles="true"
+                verbose="false"
+                >
+            <src path="${dir.test}" />
+
+            <classpath refid="project.class.path" />
+            <bootclasspath path="${java.bootclasspath}" />
+
+            <compilerarg value="-Xlint:unchecked" />
+        </javac>
+
+
 		<echo>Performing JUnit tests...</echo>
 		<junit fork="true" printsummary="true" haltonerror="true">
 			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch}" />
@@ -117,12 +114,12 @@
 
 		<echo>Creating ${ant.project.name}.jar...</echo>
 		<mkdir dir="${dir.jar}" />
-		<jar jarfile="${dir.jar}/${project.name}.jar" basedir="${dir.bin}/class/java">
-			<include name="org/jnativehook/**" />
-			<!-- <exclude name="org/jnativehook/example/NativeHookDemo.class" /> -->
+		<jar jarfile="${dir.jar}/${project.name}.jar" basedir="${dir.bin}">
+			<include name="org/jnitasks/**" />
+			<exclude name="org/jnitasks/test/**" />
+
 			<manifest>
-				<attribute name="Main-Class" value="org.jnativehook.example.NativeHookDemo" />
-				<section name="org/jnativehook">
+				<section name="org/jnitasks">
 					<attribute name="Implementation-Title" value="${project.name} Library" />
 					<attribute name="Implementation-Version" value="${project.version}" />
 					<attribute name="Implementation-Vendor" value="${project.vendor}" />
@@ -132,30 +129,18 @@
 	</target>
 
 
-	<target name="run" description="Execute the bundled example.">
-		<java classname="org.jnativehook.example.NativeHookDemo" fork="true" failonerror="true">
-			<jvmarg value="-Djava.library.path=${dir.lib}/${native.os}/${native.arch}" />
-			<classpath>
-				<pathelement location="${dir.jar}/${project.name}.jar" />
-				<pathelement path="${dir.bin}/class/java" />
-				<pathelement path="${java.class.path}" />
-			</classpath>
-		</java>
-	</target>
-
-
 	<target name="javadoc" description="Generates javadoc api documentation.">
 		<echo level="info">Generating API Documenation...</echo>
 		<mkdir dir="${dir.doc}" />
 
 		<javadoc destdir="${dir.doc}" windowtitle="${project.name}" author="true" version="true" use="true">
-			<packageset dir="${dir.src}/java" defaultexcludes="yes">
-				<include name="org/jnativehook/**" />
-				<exclude name="org/jnativehook/example/**" />
+			<packageset dir="${dir.src}" defaultexcludes="yes">
+				<include name="org/jnitasks/**" />
+				<exclude name="org/jnitasks/test/**" />
 			</packageset>
 
 			<doctitle><![CDATA[<h1>${project.name} API Documentation</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &#169; 2006-2013 ${project.vendor}. All Rights Received.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &#169; 2013 ${project.vendor}. All Rights Received.</i>]]></bottom>
 
 			<!--
 			<tag name="to.do" scope="all" description="To Do:" />
@@ -200,18 +185,8 @@
 
 			<zipfileset dir="${dir.src}" prefix="${project.name}/src">
 				<exclude name="**/.*" />
-
-				<exclude name="native/jni/org_jnativehook_GlobalScreen.h" />
 			</zipfileset>
 		</zip>
-
-		<!-- Increment and write out the build numbers
-		<propertyfile file="build.num" comment="Build Number for ANT. Do not edit!">
-			<entry key="build.major" type="int" value="${build.major}" />
-			<entry key="build.minor" type="int" value="${build.minor}" />
-			<entry key="build.revision" type="int" value="1" operation="+" />
-		</propertyfile>
-		 -->
 	</target>
 
 
