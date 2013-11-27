@@ -1,104 +1,118 @@
 package org.jnitasks.autotools;
 
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.Echo;
+import org.apache.tools.ant.taskdefs.ExecTask;
+import org.jnitasks.autotools.types.*;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.taskdefs.ExecTask;
-import org.apache.tools.ant.types.DataType;
-import org.apache.tools.ant.types.Commandline.Argument;
-
 public class ConfigureTask extends Task {
-	private String prefix = null;
-	
-	private List<FeatureType> use_flags = new ArrayList<FeatureType>();
-	
+	private File dir;
+	private File path;
+	private File prefix = null;
+	private List<ConfigFeature> flags = new ArrayList<ConfigFeature>();
+
 	@Override
     public void execute() {
 		// Set the command to execute along with any required arguments.
-		StringBuilder command = new StringBuilder("configure --verbose");
+		StringBuilder command = new StringBuilder();
+
+		// FIXME Replace the path and configure command with a variable
+		// similar to <ant antfile="" />
+		if (path != null) {
+			command.append(getUnixPath(path));
+		}
+
+		command.append("configure --verbose");
 
 		// Take care of the optional arguments.
 		if (this.prefix != null) {
 			command.append(" --prefix=");
-			command.append(prefix);
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			command.append(getUnixPath(prefix));
 		}
+
+		// Include arguments for nested Include.
+		Iterator<ConfigFeature> iterator = flags.iterator();
+		while (iterator.hasNext()) {
+			ConfigFeature feature = iterator.next();
+
+			command.append(" ").append(feature.toString());
+		}
+
+		// Print the executed command.
+		Echo echo = (Echo) getProject().createTask("echo");
+		echo.addText(command.toString());
+		echo.setTaskName(this.getTaskName());
+		echo.execute();
 
 		// Create an exec task to run a shell.  Using the current shell to 
 		// execute commands is required for Windows support.
 		ExecTask shell = (ExecTask) this.getProject().createTask("exec");
+
+		shell.setTaskName(this.getTaskName());
+
+		shell.setDir(dir);
 		shell.setExecutable("sh");
-		Argument arg = shell.createArg();
-		arg.setLine(command.toString());
+
+		shell.setFailonerror(true);
+
+		shell.createArg().setValue("-c");
+		shell.createArg().setValue(command.toString());
+
+		shell.execute();
     }
 
-	public void add(EnableType e) {
-		use_flags.add(e);
-	}
-	
-	public void add(DisableType e) {
-		use_flags.add(e);
+	public void addEnable(Enable e) {
+		flags.add(e);
 	}
 
-	public void add(WithType e) {
-		use_flags.add(e);
+	public void addDisable(Disable e) {
+		flags.add(e);
 	}
 
-	public void add(WithoutType e) {
-		use_flags.add(e);
+	public void addWith(With e) {
+		flags.add(e);
 	}
 
-	public void setPrefix(String prefix) {
+	public void addWithout(Without e) {
+		flags.add(e);
+	}
+
+	public void setDir(File dir) {
+		this.dir = dir;
+	}
+
+	public void setPath(File path) {
+		this.path = path;
+	}
+
+	public void setPrefix(File prefix) {
 		this.prefix = prefix;
 	}
 
-	private abstract class FeatureType extends DataType {
-		private String flag;
-	    
-	    public void addText(String text) {
-	    	this.flag = text;
-	    }
-		
-	    public void setFlag(String flag) {
-	    	this.flag = flag;
-	    }
-	    
-	    public String getFlag() {
-	    	return this.flag;
-	    }
-	    
-	    public abstract String toString();
-	}
+	private String getUnixPath(File path) {
+		String unixPath = null;
 
-	public class EnableType extends FeatureType {
-		@Override
-		public String toString() {
-			// TODO Auto-generated method stub
-			return "--enable-" + this.getFlag();
+		try {
+			unixPath = path.getCanonicalPath();
 		}
-		
-	}
+		catch (IOException e) {
+			unixPath = path.getAbsolutePath();
+		}
 
-	private class DisableType extends FeatureType {
-		@Override
-		public String toString() {
-			return "--disable-" + this.getFlag();
-		}
-	}
-	
-	public class WithType extends FeatureType {
-		@Override
-		public String toString() {
-			// TODO Auto-generated method stub
-			return "--with-" + this.getFlag();
-		}
-		
-	}
+		unixPath = unixPath.replaceAll(File.separator, "/");
 
-	private class WithoutType extends FeatureType {
-		@Override
-		public String toString() {
-			return "--without-" + this.getFlag();
+		if (unixPath.charAt(unixPath.length() - 1) != '/') {
+			unixPath += '/';
 		}
+
+		return unixPath;
 	}
 }

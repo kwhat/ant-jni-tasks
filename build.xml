@@ -43,14 +43,14 @@
 	<target name="compile" description="Compiles Java source files.">
 		<echo>Compiling Java source...</echo>
 		<mkdir dir="${dir.bin}" />
-		
+
+        <echo>${dir.src}</echo>
 		<javac
 			compiler="${ant.build.javac.compiler}"
 			destdir="${dir.bin}"
 			bootclasspath="${java.bootclasspath}"
 			debug="${ant.build.debug}"
 			debuglevel="lines,vars,source"
-			optimize="${project.optimize}"
 			deprecation="false"
 			includeantruntime="false"
 			listfiles="true"
@@ -68,17 +68,14 @@
         <echo>Compiling JUnit source...</echo>
         <mkdir dir="${dir.bin}" />
 
-        <javac
-                compiler="${ant.build.javac.compiler}"
+        <javac  compiler="${ant.build.javac.compiler}"
                 destdir="${dir.bin}"
                 debug="${ant.build.debug}"
                 debuglevel="lines,vars,source"
-                optimize="${project.optimize}"
                 deprecation="false"
                 includeantruntime="false"
                 listfiles="true"
-                verbose="false"
-                >
+                verbose="false">
             <src path="${dir.test}" />
 
             <classpath refid="project.class.path" />
