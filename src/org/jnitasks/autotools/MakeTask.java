@@ -58,9 +58,10 @@ public class MakeTask extends Task {
 		if (jobs.equalsIgnoreCase("auto")) {
 			this.jobs = Runtime.getRuntime().availableProcessors();
 		}
-
-		// FIXME else throw exception!
-		this.jobs = Integer.parseInt(jobs);
+		else {
+			// FIXME else throw exception!
+			this.jobs = Integer.parseInt(jobs);
+		}
 	}
 
 	public void setTarget(String target) {
