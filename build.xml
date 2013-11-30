@@ -44,7 +44,6 @@
 		<echo>Compiling Java source...</echo>
 		<mkdir dir="${dir.bin}" />
 
-        <echo>${dir.src}</echo>
 		<javac
 			compiler="${ant.build.javac.compiler}"
 			destdir="${dir.bin}"

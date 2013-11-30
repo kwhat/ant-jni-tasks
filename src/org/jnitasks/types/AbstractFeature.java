@@ -1,4 +1,4 @@
-package org.jnitasks.autotools.types;
+package org.jnitasks.types;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.condition.Os;
@@ -6,24 +6,9 @@ import org.apache.tools.ant.types.DataType;
 
 import java.util.Locale;
 
-public abstract class ConfigFeature extends DataType {
-	private String flag;
+public abstract class AbstractFeature extends DataType {
 	private String os;
 	private String osFamily;
-
-	public void addText(String text) {
-		this.flag = text;
-	}
-
-	public void setFlag(String flag) {
-		this.flag = flag;
-	}
-
-	public String getFlag() {
-		return this.flag;
-	}
-
-	public abstract String toString();
 
 	/**
 	 * List of operating systems on which the command may be executed.
@@ -74,7 +59,7 @@ public abstract class ConfigFeature extends DataType {
 	 * <li><code>false</code> otherwise.</li>
 	 * </ul>
 	 */
-	protected boolean isValidOs() {
+	public boolean isValidOs() {
 		boolean valid = false;
 
 		//hand osfamily off to Os class, if set

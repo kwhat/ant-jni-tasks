@@ -4,7 +4,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
-import org.jnitasks.autotools.types.Include;
+import org.jnitasks.types.Include;
 
 import java.io.File;
 import java.util.Iterator;
@@ -13,11 +13,13 @@ import java.util.Vector;
 
 // TODO Add support for -I, -B  via TaskContainer and DirSet
 public class AutoreconfTask extends Task {
-	private List<Include> includes = new Vector<Include>();
+	private File dir;
 	private boolean force = false;
 	private boolean install = false;
-	private File dir;
-	
+	private boolean verbose = true;
+
+	private List<Include> includes = new Vector<Include>();
+
 	@Override
     public void execute() throws BuildException {
 		// Set the command to execute along with any required arguments.
