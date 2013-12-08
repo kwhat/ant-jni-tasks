@@ -9,6 +9,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.jnitasks.toolchains.LinkerAdapter;
 import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
+import org.jnitasks.types.Library;
 
 import java.io.File;
 import java.util.Iterator;
@@ -71,6 +72,10 @@ public class LdTask extends MatchingTask {
 
 	public void addFileset(FileSet fileset) {
 		filesets.add(fileset);
+	}
+
+	public void addLibrary(Library library) {
+		features.add(library);
 	}
 
 	public void setToolchain(String toolchain) {
