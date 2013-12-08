@@ -1,9 +1,9 @@
 package org.jnitasks.toolchains;
 
 import org.apache.tools.ant.ProjectComponent;
+import org.apache.tools.ant.types.FileSet;
 import org.jnitasks.types.AbstractFeature;
 
-import java.util.Iterator;
 import java.util.Vector;
 
 public abstract class LinkerAdapter extends ProjectComponent {
@@ -11,19 +11,10 @@ public abstract class LinkerAdapter extends ProjectComponent {
 	protected String executable = "cc";
 
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
-	private Vector<String> inFiles = new Vector<String>();
 	private String outFile = "a.out";
 
 	public void addArg(AbstractFeature arg) {
 		this.features.add(arg);
-	}
-
-	public void addInFile(String file) {
-		this.inFiles.add(file);
-	}
-
-	public Iterator<String> getInFiles() {
-		return inFiles.iterator();
 	}
 
 	public void setOutFile(String file) {
@@ -49,7 +40,6 @@ public abstract class LinkerAdapter extends ProjectComponent {
 		return this.describeCommand();
 	}
 
-
 	public static class Argument extends AbstractFeature {
 		private String value;
 
@@ -62,4 +52,15 @@ public abstract class LinkerAdapter extends ProjectComponent {
 		}
 	}
 
+	public static class FileSetArgument extends AbstractFeature {
+		private FileSet files;
+
+		public void setFileSet(FileSet files) {
+			this.files = files;
+		}
+
+		public FileSet getFileSet() {
+			return this.files;
+		}
+	}
 }

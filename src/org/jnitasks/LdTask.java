@@ -1,7 +1,6 @@
 package org.jnitasks;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.taskdefs.MatchingTask;
@@ -11,12 +10,9 @@ import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
 import org.jnitasks.types.Library;
 
-import java.io.File;
-import java.util.Iterator;
 import java.util.Vector;
 
 public class LdTask extends MatchingTask {
-	protected Vector<FileSet> filesets = new Vector<FileSet>();
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 	private String outfile = null;
 	private String toolchain = "gcc";
@@ -28,25 +24,12 @@ public class LdTask extends MatchingTask {
 
 		// Setup the compiler.
 		LinkerAdapter linker = ToolchainFactory.getLinker(toolchain);
+		linker.setProject(getProject());
 		linker.setOutFile(outfile);
 
 		for (AbstractFeature feat : features) {
 			if (feat.isValidOs()) {
 				linker.addArg(feat);
-			}
-		}
-
-		Iterator<FileSet> iterator = filesets.iterator();
-		while (iterator.hasNext()) {
-			FileSet file = iterator.next();
-
-			DirectoryScanner scanner = file.getDirectoryScanner(getProject());
-			String[] files = scanner.getIncludedFiles();
-			for(int i = 0; i < files.length; i++) {
-				File basePath = scanner.getBasedir();
-
-				// Convert Windows paths to posix compatible paths.
-				linker.addInFile(new File(basePath, files[i]).getAbsolutePath().replace('\\','/'));
 			}
 		}
 
@@ -56,7 +39,6 @@ public class LdTask extends MatchingTask {
 		echo.addText(linker.describeCommand());
 		echo.setTaskName(this.getTaskName());
 		echo.execute();
-
 
 		// Create an exec task to run a shell.  Using the current shell to
 		// execute commands is required for Windows support.
@@ -71,7 +53,11 @@ public class LdTask extends MatchingTask {
 	}
 
 	public void addFileset(FileSet fileset) {
-		filesets.add(fileset);
+		// Wrap FileSet to allow for argument order.
+		LinkerAdapter.FileSetArgument arg = new LinkerAdapter.FileSetArgument();
+		arg.setFileSet(fileset);
+
+		features.add(arg);
 	}
 
 	public void addLibrary(Library library) {

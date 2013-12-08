@@ -24,6 +24,7 @@ public class CcTask extends MatchingTask {
 	public void execute() {
 		// Setup the compiler.
 		CompilerAdapter compiler = ToolchainFactory.getCompiler(toolchain);
+		compiler.setProject(getProject());
 
 		for (AbstractFeature feat : features) {
 			if (feat.isValidOs()) {

@@ -1,10 +1,11 @@
 package org.jnitasks.toolchains.adapters;
 
+import org.apache.tools.ant.DirectoryScanner;
 import org.jnitasks.toolchains.LinkerAdapter;
 import org.jnitasks.types.AbstractFeature;
 import org.jnitasks.types.Library;
 
-import java.util.Iterator;
+import java.io.File;
 
 public class GccLinker extends LinkerAdapter {
 	public GccLinker() {
@@ -28,15 +29,22 @@ public class GccLinker extends LinkerAdapter {
 				}
 			}
 			else if (feat instanceof LinkerAdapter.Argument) {
-				Argument arg = (Argument) feat;
+				LinkerAdapter.Argument arg = (LinkerAdapter.Argument) feat;
 
 				command.append(' ').append(arg.getValue());
 			}
-		}
+			else if (feat instanceof LinkerAdapter.FileSetArgument) {
+				LinkerAdapter.FileSetArgument arg = (LinkerAdapter.FileSetArgument) feat;
 
-		Iterator<String> files = this.getInFiles();
-		while (files.hasNext()) {
-			command.append(' ').append(files.next());
+				DirectoryScanner scanner = arg.getFileSet().getDirectoryScanner(getProject());
+				String[] files = scanner.getIncludedFiles();
+				for(int i = 0; i < files.length; i++) {
+					File basePath = scanner.getBasedir();
+
+					// Convert Windows paths to posix compatible paths.
+					command.append(' ').append(new File(basePath, files[i]).getAbsolutePath().replace('\\', '/'));
+				}
+			}
 		}
 
 		command.append(" -o ").append(this.getOutFile());
