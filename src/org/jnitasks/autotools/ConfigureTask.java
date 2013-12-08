@@ -3,29 +3,32 @@ package org.jnitasks.autotools;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
-import org.jnitasks.autotools.types.Enable;
-import org.jnitasks.autotools.types.With;
-import org.jnitasks.types.*;
+import org.jnitasks.types.ToggleFeature;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 public class ConfigureTask extends Task {
 	private File dir;
 	private File path;
 	private File prefix = null;
-	private List<ToggleFeature> flags = new ArrayList<ToggleFeature>();
+	private List<ToggleFeature> flags = new Vector<ToggleFeature>();
 
+    public Enable createEnable() {
+		Enable feat = new Enable();
+		flags.add(feat);
 
-	public void addEnable(Enable e) {
-		flags.add(e);
+		return feat;
 	}
 
-	public void addWith(With e) {
-		flags.add(e);
+	public With createWith() {
+		With feat = new With();
+		flags.add(feat);
+
+		return feat;
 	}
 
 	public void setDir(File dir) {
@@ -127,4 +130,24 @@ public class ConfigureTask extends Task {
 
 		shell.execute();
     }
+
+	public static class Enable extends ToggleFeature {
+		private String flag;
+
+		public void addText(String flag) {
+			this.flag = flag;
+		}
+
+		public void setFlag(String flag) {
+			this.flag = flag;
+		}
+
+		public String getFlag() {
+			return this.flag;
+		}
+	}
+
+	public static class With extends Enable {
+
+	}
 }

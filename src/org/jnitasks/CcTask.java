@@ -2,27 +2,40 @@ package org.jnitasks;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.taskdefs.Echo;
-import org.apache.tools.ant.taskdefs.Parallel;
-import org.apache.tools.ant.taskdefs.Sequential;
+import org.apache.tools.ant.taskdefs.*;
 import org.apache.tools.ant.types.FileSet;
+import org.jnitasks.toolchains.CompilerAdapter;
+import org.jnitasks.toolchains.ToolchainFactory;
+import org.jnitasks.types.AbstractFeature;
+import org.jnitasks.types.Define;
+import org.jnitasks.types.Include;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class CcTask extends Task {
-	private Vector<FileSet> filesets = new Vector<FileSet>();
-	private int jobs;
-	private File objdir;
+public class CcTask extends MatchingTask {
+	protected Vector<FileSet> filesets = new Vector<FileSet>();
+	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
+	private int jobs = Runtime.getRuntime().availableProcessors();
+	private File objdir = null;
+	private String toolchain = "gcc";
 
 	public void execute() {
+		// Setup the compiler.
+		CompilerAdapter compiler = ToolchainFactory.getCompiler(toolchain);
+
+		for (AbstractFeature feat : features) {
+			if (feat.isValidOs()) {
+				compiler.addArg(feat);
+			}
+		}
+
+		// Create a parallel task to try and run the compiler command in parallel.
 		Parallel parallel = (Parallel) this.getProject().createTask("parallel");
 		parallel.setFailOnAny(true);
 		parallel.setThreadCount(jobs);
 
-		String foundLocation = null;
 
 		Iterator<FileSet> iterator = filesets.iterator();
 		while (iterator.hasNext()) {
@@ -31,63 +44,61 @@ public class CcTask extends Task {
 			DirectoryScanner scanner = file.getDirectoryScanner(getProject());
 			String[] files = scanner.getIncludedFiles();
 			for(int i = 0; i < files.length; i++) {
-				String filename = files[i].replace('\\','/');
+				File basePath = scanner.getBasedir();
 
-				filename = filename.substring(filename.lastIndexOf("/") + 1);
-				if (foundLocation == null && file.equals(filename)) {
-					File base  = scanner.getBasedir();
-					File found = new File(base, files[i]);
-					foundLocation = found.getAbsolutePath();
-
-
-					StringBuilder command = new StringBuilder();
-					command.append(base).append(' ')
-							.append(found).append(' ')
-							.append(foundLocation).append(' ');
-
-					Sequential sequential = (Sequential) this.getProject().createTask("sequential");
-
-					// Print the executed command.
-					Echo echo = (Echo) getProject().createTask("echo");
-					echo.addText(command.toString());
-					echo.setTaskName(this.getTaskName());
-					sequential.addTask(echo);
-
-					// Create an exec task to run a shell.  Using the current shell to
-					// execute commands is required for Windows support.
-					/*
-					ExecTask shell = (ExecTask) this.getProject().createTask("exec");
-
-					shell.setTaskName(this.getTaskName());
-
-					//shell.setPath(dir);
-					shell.setExecutable("sh");
-
-					shell.setFailonerror(true);
-
-					shell.createArg().setValue("-c");
-					shell.createArg().setValue(command.toString());
-
-					sequential.addTask(shell);
-
-					parallel.addTask(sequential);
-					*/
+				// Convert Windows paths to posix compatible paths.
+				compiler.setInFile(new File(basePath, files[i]).getAbsolutePath().replace('\\','/'));
+				if (objdir != null) {
+					compiler.setOutFile(
+							new File(objdir, files[i].substring(0, files[i].lastIndexOf('.')) + ".o")
+									.getAbsolutePath().replace('\\','/'));
 				}
+
+
+				Sequential sequential = (Sequential) this.getProject().createTask("sequential");
+
+				// Print the executed command.
+				Echo echo = (Echo) getProject().createTask("echo");
+				echo.addText(compiler.describeCommand());
+				echo.setTaskName(this.getTaskName());
+				sequential.addTask(echo);
+
+
+				// Create an exec task to run a shell.  Using the current shell to
+				// execute commands is required for Windows support.
+
+				ExecTask shell = (ExecTask) getProject().createTask("exec");
+				shell.setTaskName(this.getTaskName());
+				//shell.setDir(dir);
+				shell.setExecutable("sh");
+				shell.setFailonerror(true);
+				shell.createArg().setValue("-c");
+				shell.createArg().setValue(compiler.describeCommand());
+				sequential.addTask(shell);
+
+				// Add the sequential task containing echo and cc shell command to the parallel task.
+				parallel.addTask(sequential);
 			}
 		}
+
+		// Execute the compile.
+		parallel.execute();
 	}
 
 	public void addFileset(FileSet fileset) {
 		filesets.add(fileset);
 	}
 
+	public void addDefine(Define macro) {
+		features.add(macro);
+	}
+
+	public void addInclude(Include include) {
+		features.add(include);
+	}
+
 	public void setToolchain(String toolchain) {
-		try {
-			Class<?> test = Class.forName("org.jnitasks.toolchains." + toolchain);
-		}
-		catch (ClassNotFoundException e) {
-			throw new BuildException("The toolchain \"" + toolchain + "\" could not be found");
-		}
+		this.toolchain = toolchain;
 	}
 
 	public void setObjdir(File objdir) {
@@ -106,5 +117,12 @@ public class CcTask extends Task {
 			// FIXME else throw exception!
 			this.jobs = Integer.parseInt(jobs);
 		}
+	}
+
+	public CompilerAdapter.Argument createArg() {
+		CompilerAdapter.Argument arg = new CompilerAdapter.Argument();
+		features.add(arg);
+
+		return arg;
 	}
 }

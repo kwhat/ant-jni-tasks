@@ -4,7 +4,6 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
-import org.jnitasks.types.Include;
 
 import java.io.File;
 import java.util.Iterator;
@@ -17,11 +16,41 @@ public class AutoreconfTask extends Task {
 	private boolean force = false;
 	private boolean install = false;
 	private boolean verbose = true;
-
 	private List<Include> includes = new Vector<Include>();
 
+	public void setDir(File dir) {
+		this.dir  = dir;
+	}
+
+	public void setForce(boolean force) {
+		this.force = force;
+	}
+
+	public void setInstall(boolean install) {
+		this.install = install;
+	}
+
+	public AutoreconfTask.Include createInclude() {
+		Include inc = new Include();
+		includes.add(inc);
+
+		return inc;
+	}
+
+	public static class Include extends org.jnitasks.types.Include {
+		private boolean prepend = false;
+
+		public void setPrepend(boolean prepend) {
+			this.prepend = prepend;
+		}
+
+		public boolean isPrepend() {
+			return this.prepend;
+		}
+	}
+
 	@Override
-    public void execute() throws BuildException {
+	public void execute() throws BuildException {
 		// Set the command to execute along with any required arguments.
 		StringBuilder command = new StringBuilder("autoreconf --verbose");
 
@@ -68,21 +97,5 @@ public class AutoreconfTask extends Task {
 		shell.createArg().setValue(command.toString());
 
 		shell.execute();
-    }
-
-	public void setDir(File dir) {
-		this.dir  = dir;
-	}
-
-	public void setForce(boolean force) {
-		this.force = force;
-	}
-
-	public void setInstall(boolean install) {
-		this.install = install;
-	}
-
-	public void addInclude(Include include) {
-		this.includes.add(include);
 	}
 }

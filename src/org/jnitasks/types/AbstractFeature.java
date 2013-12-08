@@ -67,7 +67,7 @@ public abstract class AbstractFeature extends DataType {
 			String myos = System.getProperty("os.name");
 
 			log("Current OS is " + myos, Project.MSG_VERBOSE);
-			if (os == null || os.indexOf(myos) >= 0) {
+			if (os == null || os.equalsIgnoreCase(myos)) {
 				// this command will be executed only on the specified OS
 				valid = true;
 			}

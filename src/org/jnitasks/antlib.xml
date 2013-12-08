@@ -1,14 +1,13 @@
 <?xml version="1.0"?>
 <antlib>
     <typedef name="autoreconf" classname="org.jnitasks.autotools.AutoreconfTask" />
-    <typedef name="enable" classname="org.jnitasks.autotools.types.Enable" />
-
     <typedef name="configure" classname="org.jnitasks.autotools.ConfigureTask" />
-    <typedef name="enable" classname="org.jnitasks.autotools.types.Enable" />
-    <typedef name="with" classname="org.jnitasks.autotools.types.With" />
-
     <typedef name="make" classname="org.jnitasks.autotools.MakeTask" />
 
+    <typedef name="cc" classname="org.jnitasks.CcTask" />
+    <typedef name="ld" classname="org.jnitasks.LdTask" />
 
-
+    <typedef name="define" classname="org.jnitasks.types.Define" />
+    <typedef name="include" classname="org.jnitasks.types.Include" />
+    <typedef name="library" classname="org.jnitasks.types.Library" />
 </antlib>
