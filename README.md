@@ -8,11 +8,11 @@ JNITasks provide a simple and reliable way to build JNI dependencies for Java pr
 free to help correct that problem.*
 
 ### Supported Toolchains
-⋅⋅* GNU C Compiler
-⋅⋅* GNU C++ Compiler
+* GNU C Compiler
+* GNU C++ Compiler
 
 ### Supported Build Systems
-⋅⋅* GNU Autotools
+* GNU Autotools
 
 Need support for additional features, toolchains or build systems?  Please file a feature request bug or better yet,
 create a branch and develop your own!
@@ -44,11 +44,11 @@ standards, however I strongly discourage their use for portability reasons.
 ### Compiling
 
 Compiling should be done in the following order:
-..1 Start by compiling all of the dependent libraries needed using the build system tools provided by JNITasks.
-..2 Compile all Java code including code dependent on native methods.
-..3 Use Ant's javah task to produce a native header for your JNI code.
-..4 Compile your JNI code using either the cc task.
-..5 Link your compiled object files against your native library as either a dynamic or static library.
+1. Start by compiling all of the dependent libraries needed using the build system tools provided by JNITasks.
+2. Compile all Java code including code dependent on native methods.
+3. Use Ant's javah task to produce a native header for your JNI code.
+4. Compile your JNI code using either the cc task.
+5. Link your compiled object files against your native library as either a dynamic or static library.
 
 ## Example Projects
 The following are projects that currently use JNITasks that you may use as an example.
