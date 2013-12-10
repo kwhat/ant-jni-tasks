@@ -24,6 +24,8 @@
     <typedef name="configure" classname="org.jnitasks.autotools.ConfigureTask" />
     <typedef name="make" classname="org.jnitasks.autotools.MakeTask" />
 
+    <typedef name="pkgconfig" classname="org.jnitasks.pkgconfig.PkgConfigTask" />
+
     <typedef name="cc" classname="org.jnitasks.CcTask" />
     <typedef name="ld" classname="org.jnitasks.LdTask" />
 
