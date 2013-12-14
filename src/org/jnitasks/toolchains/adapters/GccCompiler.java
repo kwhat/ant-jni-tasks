@@ -25,30 +25,33 @@ import org.jnitasks.types.Include;
 public class GccCompiler extends CompilerAdapter {
 	public GccCompiler() {
 		super();
+
 		super.executable = "gcc";
 	}
 
 	public String describeCommand() {
-		StringBuilder command = new StringBuilder(this.getExecutable());
+		StringBuilder command = new StringBuilder(this.getCommand());
 
 		for (AbstractFeature feat : features) {
-			if (feat instanceof Define) {
-				Define def = (Define) feat;
+			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
+				if (feat instanceof Define) {
+					Define def = (Define) feat;
 
-				command.append(" -D").append(def.getName());
-				if (def.getValue() != null) {
-					command.append('=').append(def.getValue());
+					command.append(" -D").append(def.getName());
+					if (def.getValue() != null) {
+						command.append('=').append(def.getValue());
+					}
 				}
-			}
-			else if (feat instanceof Include) {
-				Include inc = (Include) feat;
+				else if (feat instanceof Include) {
+					Include inc = (Include) feat;
 
-				command.append(" -I").append(inc.getPath());
-			}
-			else if (feat instanceof Argument) {
-				Argument arg = (Argument) feat;
+					command.append(" -I").append(inc.getPath());
+				}
+				else if (feat instanceof Argument) {
+					Argument arg = (Argument) feat;
 
-				command.append(' ').append(arg.getValue());
+					command.append(' ').append(arg.getValue());
+				}
 			}
 		}
 

@@ -24,9 +24,8 @@ import java.util.Collection;
 import java.util.Vector;
 
 public abstract class CompilerAdapter extends ProjectComponent {
-	protected String prefix = "";
+	private String command = null;
 	protected String executable = "cc";
-
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 	private String inFile, outFile;
 
@@ -56,18 +55,27 @@ public abstract class CompilerAdapter extends ProjectComponent {
 		return this.outFile;
 	}
 
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
+	public void setCommand(String command) {
+		this.command = command;
 	}
 
-	public String getExecutable() {
-		return prefix + executable;
+	public String getCommand() {
+		String cc = command;
+		if (cc == null) {
+			if ((cc = getProject().getProperty("ant.build.native.compiler")) == null) {
+				if ((cc = System.getenv().get("CC")) == null) {
+					cc = executable;
+				}
+			}
+		}
+
+		return cc;
 	}
 
 	public abstract String describeCommand();
 
 	public String toString() {
-		return this.describeCommand();
+		return describeCommand();
 	}
 
 
@@ -79,8 +87,7 @@ public abstract class CompilerAdapter extends ProjectComponent {
 		}
 
 		public String getValue() {
-			return this.value;
+			return value;
 		}
 	}
-
 }

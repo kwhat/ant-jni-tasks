@@ -24,8 +24,104 @@ import org.apache.tools.ant.types.DataType;
 import java.util.Locale;
 
 public abstract class AbstractFeature extends DataType {
+	/** The "if" condition to test on execution. */
+	private String ifCondition = "";
+	/** The "unless" condition to test on execution. */
+	private String unlessCondition = "";
+
 	private String os;
 	private String osFamily;
+
+	/**
+	 * Sets the "if" condition to test on execution. This is the
+	 * name of a property to test for existence - if the property
+	 * is not set, the task will not execute. The property goes
+	 * through property substitution once before testing, so if
+	 * property <code>foo</code> has value <code>bar</code>, setting
+	 * the "if" condition to <code>${foo}_x</code> will mean that the
+	 * task will only execute if property <code>bar_x</code> is set.
+	 *
+	 * @param property The property condition to test on execution.
+	 *                 May be <code>null</code>, in which case
+	 *                 no "if" test is performed.
+	 */
+	public void setIf(String property) {
+		ifCondition = (property == null) ? "" : property;
+	}
+
+	/**
+	 * Returns the "if" property condition of this target.
+	 *
+	 * @return the "if" property condition or <code>null</code> if no
+	 *         "if" condition had been defined.
+	 * @since 1.6.2
+	 */
+	public String getIf() {
+		return ("".equals(ifCondition) ? null : ifCondition);
+	}
+
+	/**
+	 * Sets the "unless" condition to test on execution. This is the
+	 * name of a property to test for existence - if the property
+	 * is set, the task will not execute. The property goes
+	 * through property substitution once before testing, so if
+	 * property <code>foo</code> has value <code>bar</code>, setting
+	 * the "unless" condition to <code>${foo}_x</code> will mean that the
+	 * task will only execute if property <code>bar_x</code> isn't set.
+	 *
+	 * @param property The property condition to test on execution.
+	 *                 May be <code>null</code>, in which case
+	 *                 no "unless" test is performed.
+	 */
+	public void setUnless(String property) {
+		unlessCondition = (property == null) ? "" : property;
+	}
+
+	/**
+	 * Returns the "unless" property condition of this target.
+	 *
+	 * @return the "unless" property condition or <code>null</code>
+	 *         if no "unless" condition had been defined.
+	 * @since 1.6.2
+	 */
+	public String getUnless() {
+		return ("".equals(unlessCondition) ? null : unlessCondition);
+	}
+
+	/**
+	 * Tests whether or not the "if" condition is satisfied.
+	 *
+	 * @return whether or not the "if" condition is satisfied. If no
+	 *         condition (or an empty condition) has been set,
+	 *         <code>true</code> is returned.
+	 *
+	 * @see #setIf(String)
+	 */
+	public boolean isIfConditionValid() {
+		if ("".equals(ifCondition)) {
+			return true;
+		}
+
+		String test = getProject().replaceProperties(ifCondition);
+		return getProject().getProperty(test) != null;
+	}
+
+	/**
+	 * Tests whether or not the "unless" condition is satisfied.
+	 *
+	 * @return whether or not the "unless" condition is satisfied. If no
+	 *         condition (or an empty condition) has been set,
+	 *         <code>true</code> is returned.
+	 *
+	 * @see #setUnless(String)
+	 */
+	public boolean isUnlessConditionValid() {
+		if ("".equals(unlessCondition)) {
+			return true;
+		}
+		String test = getProject().replaceProperties(unlessCondition);
+		return getProject().getProperty(test) == null;
+	}
 
 	/**
 	 * List of operating systems on which the command may be executed.

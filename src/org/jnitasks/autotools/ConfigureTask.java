@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Vector;
 
 public class ConfigureTask extends Task {
-	private File dir;
-	private File path;
+	private String build = null;
+	private String host = null;
+	private File dir = null;
+	private File path = null;
 	private File prefix = null;
 	private List<ToggleFeature> flags = new Vector<ToggleFeature>();
 
@@ -29,6 +31,14 @@ public class ConfigureTask extends Task {
 		flags.add(feat);
 
 		return feat;
+	}
+
+	public void setBuild(String build) {
+		this.build = build;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
 	}
 
 	public void setDir(File dir) {
@@ -75,6 +85,14 @@ public class ConfigureTask extends Task {
 
 		command.append("configure --verbose");
 
+		if (this.build != null) {
+			command.append(" --build ").append(this.build);
+		}
+
+		if (this.host != null) {
+			command.append(" --host ").append(this.host);
+		}
+
 		// Take care of the optional arguments.
 		if (this.prefix != null) {
 			command.append(" --prefix=");
@@ -88,7 +106,7 @@ public class ConfigureTask extends Task {
 		while (iterator.hasNext()) {
 			ToggleFeature feature = iterator.next();
 
-			if (feature.isValidOs()) {
+			if (feature.isValidOs() && feature.isIfConditionValid() && feature.isUnlessConditionValid()) {
 				if (feature instanceof With) {
 					if (!feature.isNegated()) {
 						command.append(" --with-").append(((With) feature).getFlag());

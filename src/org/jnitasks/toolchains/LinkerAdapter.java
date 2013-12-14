@@ -24,7 +24,7 @@ import org.jnitasks.types.AbstractFeature;
 import java.util.Vector;
 
 public abstract class LinkerAdapter extends ProjectComponent {
-	protected String prefix = "";
+	private String command = null;
 	protected String executable = "cc";
 
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
@@ -43,12 +43,21 @@ public abstract class LinkerAdapter extends ProjectComponent {
 		return this.outFile;
 	}
 
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
+	public void setCommand(String command) {
+		this.command = command;
 	}
 
-	public String getExecutable() {
-		return prefix + executable;
+	public String getCommand() {
+		String cc = command;
+		if (cc == null) {
+			if ((cc = getProject().getProperty("ant.build.native.compiler")) == null) {
+				if ((cc = System.getenv().get("CC")) == null) {
+					cc = executable;
+				}
+			}
+		}
+
+		return cc;
 	}
 
 	public abstract String describeCommand();

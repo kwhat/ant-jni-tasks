@@ -68,7 +68,7 @@ public class AutoreconfTask extends Task {
 		while (iterator.hasNext()) {
 			Include include = iterator.next();
 
-			if (include.isValidOs()) {
+			if (include.isValidOs() && include.isIfConditionValid() && include.isUnlessConditionValid()) {
 				if (include.isPrepend()) {
 					command.append(" -B").append(include.getPath());
 				}
