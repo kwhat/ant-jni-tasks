@@ -29,6 +29,14 @@ public class GccCompiler extends CompilerAdapter {
 		super.executable = "gcc";
 	}
 
+	public void setInFile(String file) {
+		super.setInFile(file.replace('\\', '/'));
+	}
+
+	public void setOutFile(String file) {
+		super.setOutFile(file.replace('\\', '/'));
+	}
+
 	public String describeCommand() {
 		StringBuilder command = new StringBuilder(this.getCommand());
 
@@ -45,7 +53,7 @@ public class GccCompiler extends CompilerAdapter {
 				else if (feat instanceof Include) {
 					Include inc = (Include) feat;
 
-					command.append(" -I").append(inc.getPath());
+					command.append(" -I").append(inc.getPath().replace('\\', '/'));
 				}
 				else if (feat instanceof Argument) {
 					Argument arg = (Argument) feat;

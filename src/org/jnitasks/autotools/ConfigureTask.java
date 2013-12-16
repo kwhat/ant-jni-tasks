@@ -63,7 +63,7 @@ public class ConfigureTask extends Task {
 			unixPath = path.getAbsolutePath();
 		}
 
-		unixPath = unixPath.replaceAll(File.separator, "/");
+		unixPath = unixPath.replaceAll("\\\\", "/");
 
 		if (unixPath.charAt(unixPath.length() - 1) != '/') {
 			unixPath += '/';

@@ -45,16 +45,27 @@ public class PkgConfigTask extends Task {
 		// Set the command to execute along with any required arguments.
 		StringBuilder command = new StringBuilder("pkg-config");
 
+		// Create an exec task to run a shell.  Using the current shell to
+		// execute commands is required for Windows support.
+		ExecTask shell = (ExecTask) getProject().createTask("exec");
+		shell.setTaskName(this.getTaskName());
+		shell.setExecutable(command.toString());
+		shell.setFailonerror(true);
+		shell.setOutputproperty(this.outputProperty);
+
 		// Take care of the optional arguments.
 		if (this.cflags) {
 			command.append(" --cflags");
+			shell.createArg().setValue("--cflags");
 		}
 
 		if (this.libs) {
 			command.append(" --libs");
+			shell.createArg().setValue("--libs");
 		}
 
 		command.append(' ').append(this.packages);
+		shell.createArg().setLine(this.packages);
 
 		StringBuilder configPath = new StringBuilder();
 		Iterator<DirSet> iterator = dirsets.iterator();
@@ -77,8 +88,8 @@ public class PkgConfigTask extends Task {
 					}
 				}
 
-				// Convert Windows dirsets to posix compatible dirsets.
-				configPath.append(new File(basePath, dirs[i]).getAbsolutePath().replace('\\', '/'));
+				// Do not convert Windows dirsets to posix compatible paths.
+				configPath.append(new File(basePath, dirs[i]).getAbsolutePath());
 			}
 		}
 
@@ -89,16 +100,6 @@ public class PkgConfigTask extends Task {
 		echo.setTaskName(this.getTaskName());
 		echo.execute();
 
-
-		// Create an exec task to run a shell.  Using the current shell to
-		// execute commands is required for Windows support.
-		ExecTask shell = (ExecTask) getProject().createTask("exec");
-		shell.setTaskName(this.getTaskName());
-
-		shell.setExecutable("sh");
-		shell.setFailonerror(true);
-		shell.setOutputproperty(this.outputProperty);
-
 		// Create the required environment variables.
 		if (configPath.length() > 0) {
 			Environment.Variable var = new Environment.Variable();
@@ -107,9 +108,6 @@ public class PkgConfigTask extends Task {
 
 			shell.addEnv(var);
 		}
-
-		shell.createArg().setValue("-c");
-		shell.createArg().setValue(command.toString());
 
 		shell.execute();
 	}
