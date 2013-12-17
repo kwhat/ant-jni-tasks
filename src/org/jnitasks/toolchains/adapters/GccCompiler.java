@@ -17,55 +17,49 @@
  */
 package org.jnitasks.toolchains.adapters;
 
+import org.jnitasks.CcTask;
 import org.jnitasks.toolchains.CompilerAdapter;
 import org.jnitasks.types.AbstractFeature;
-import org.jnitasks.types.Define;
-import org.jnitasks.types.Include;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class GccCompiler extends CompilerAdapter {
 	public GccCompiler() {
 		super();
 
-		super.executable = "gcc";
+		setExecutable("gcc");
 	}
 
-	public void setInFile(String file) {
-		super.setInFile(file.replace('\\', '/'));
-	}
-
-	public void setOutFile(String file) {
-		super.setOutFile(file.replace('\\', '/'));
-	}
-
-	public String describeCommand() {
-		StringBuilder command = new StringBuilder(this.getCommand());
+	public Iterator<String> getArgs() {
+		List<String> args = new ArrayList<String>();
 
 		for (AbstractFeature feat : features) {
-			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
-				if (feat instanceof Define) {
-					Define def = (Define) feat;
+			if (feat instanceof CcTask.Define) {
+				CcTask.Define def = (CcTask.Define) feat;
+				String macro = "-D" + def.getName();
 
-					command.append(" -D").append(def.getName());
-					if (def.getValue() != null) {
-						command.append('=').append(def.getValue());
-					}
+				if (def.getValue() != null) {
+					macro += '=' + def.getValue();
 				}
-				else if (feat instanceof Include) {
-					Include inc = (Include) feat;
+				args.add(macro);
+			}
+			else if (feat instanceof CcTask.Include) {
+				CcTask.Include inc = (CcTask.Include) feat;
 
-					command.append(" -I").append(inc.getPath().replace('\\', '/'));
-				}
-				else if (feat instanceof Argument) {
-					Argument arg = (Argument) feat;
+				args.add("-I" + inc.getPath().replace('\\', '/'));
+			}
+			else if (feat instanceof CcTask.Argument) {
+				CcTask.Argument arg = (CcTask.Argument) feat;
 
-					command.append(' ').append(arg.getValue());
-				}
+				args.add(arg.getValue());
 			}
 		}
 
-		command.append(" -c ").append(this.getInFile());
-		command.append(" -o ").append(this.getOutFile());
+		args.add("-c " + this.getInFile().replace('\\', '/'));
+		args.add("-o " + this.getOutFile().replace('\\', '/'));
 
-		return command.toString();
+		return args.iterator();
 	}
 }

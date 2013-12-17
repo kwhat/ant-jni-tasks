@@ -21,6 +21,6 @@ public class GxxCompiler extends GccCompiler {
 	public GxxCompiler() {
 		super();
 
-		super.executable = "g++";
+		setExecutable("g++");
 	}
 }

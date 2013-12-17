@@ -25,53 +25,20 @@ import org.apache.tools.ant.types.FileSet;
 import org.jnitasks.toolchains.LinkerAdapter;
 import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
-import org.jnitasks.types.Library;
 
+import java.io.File;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class LdTask extends MatchingTask {
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 	private String outfile = null;
 	private String toolchain = "gcc";
-
-	public void execute() {
-		if (outfile == null) {
-			throw new BuildException("The outfile attribute is required");
-		}
-
-		// Setup the compiler.
-		LinkerAdapter linker = ToolchainFactory.getLinker(toolchain);
-		linker.setProject(getProject());
-		linker.setOutFile(outfile);
-
-		for (AbstractFeature feat : features) {
-			if (feat.isValidOs()) {
-				linker.addArg(feat);
-			}
-		}
-
-
-		// Print the executed command.
-		Echo echo = (Echo) getProject().createTask("echo");
-		echo.addText(linker.describeCommand());
-		echo.setTaskName(this.getTaskName());
-		echo.execute();
-
-		// Create an exec task to run a shell.  Using the current shell to
-		// execute commands is required for Windows support.
-		ExecTask shell = (ExecTask) getProject().createTask("exec");
-		shell.setTaskName(this.getTaskName());
-		//shell.setDir(dir);
-		shell.setExecutable("sh");
-		shell.setFailonerror(true);
-		shell.createArg().setValue("-c");
-		shell.createArg().setValue(linker.describeCommand());
-		shell.execute();
-	}
+	private String host = "";
 
 	public void addFileset(FileSet fileset) {
 		// Wrap FileSet to allow for argument order.
-		LinkerAdapter.FileSetArgument arg = new LinkerAdapter.FileSetArgument();
+		LdTask.FileSetArgument arg = new LdTask.FileSetArgument();
 		arg.setFileSet(fileset);
 
 		features.add(arg);
@@ -89,10 +56,110 @@ public class LdTask extends MatchingTask {
 		this.outfile = outfile;
 	}
 
-	public LinkerAdapter.Argument createArg() {
-		LinkerAdapter.Argument arg = new LinkerAdapter.Argument();
+	public LdTask.Argument createArg() {
+		LdTask.Argument arg = new LdTask.Argument();
 		features.add(arg);
 
 		return arg;
+	}
+
+	public void execute() {
+		if (outfile == null) {
+			throw new BuildException("The outfile attribute is required");
+		}
+
+		// Setup the compiler.
+		LinkerAdapter linker = ToolchainFactory.getLinker(toolchain);
+		linker.setProject(getProject());
+		linker.setOutFile(outfile);
+
+		if (host.length() > 0) {
+			// Prepend the host string to the executable.
+			linker.setExecutable(host + '-' + linker.getExecutable());
+		}
+		else if (getProject().getProperty("ant.build.native.linker") != null) {
+			linker.setExecutable(getProject().getProperty("ant.build.native.compiler"));
+		}
+		else if (System.getenv().get("CC") != null) {
+			linker.setExecutable(System.getenv().get("LD"));
+		}
+
+		for (AbstractFeature feat : features) {
+			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
+				linker.addArg(feat);
+			}
+		}
+
+
+		// Print the executed command.
+		Echo echo = (Echo) getProject().createTask("echo");
+		echo.setTaskName(this.getTaskName());
+		echo.setAppend(true);
+
+		// Create an exec task to run a shell.  Using the current shell to
+		// execute commands is required for Windows support.
+		ExecTask shell = (ExecTask) getProject().createTask("exec");
+		shell.setTaskName(this.getTaskName());
+		shell.setFailonerror(true);
+		//shell.setDir(dir);
+
+		echo.addText(linker.getExecutable());
+		shell.setExecutable(linker.getExecutable());
+
+		Iterator<String> args = linker.getArgs();
+		while (args.hasNext()) {
+			String arg = args.next();
+
+			echo.addText(" " + arg);
+			shell.createArg().setLine(arg);
+		}
+
+		echo.execute();
+		shell.execute();
+	}
+
+	public class Argument extends AbstractFeature {
+		private String value;
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+	}
+
+	public class Library extends AbstractFeature {
+		private File path;
+		private String lib;
+
+		public void setPath(File path) {
+			this.path = path;
+		}
+
+		public File getPath() {
+			return this.path;
+		}
+
+		public void setLib(String lib) {
+			this.lib = lib;
+		}
+
+		public String getLib() {
+			return lib;
+		}
+	}
+
+	public class FileSetArgument extends AbstractFeature {
+		private FileSet files;
+
+		public void setFileSet(FileSet files) {
+			this.files = files;
+		}
+
+		public FileSet getFileSet() {
+			return this.files;
+		}
 	}
 }

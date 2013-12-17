@@ -18,11 +18,14 @@
 package org.jnitasks.toolchains.adapters;
 
 import org.apache.tools.ant.DirectoryScanner;
+import org.jnitasks.LdTask;
 import org.jnitasks.toolchains.LinkerAdapter;
 import org.jnitasks.types.AbstractFeature;
-import org.jnitasks.types.Library;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class GccLinker extends LinkerAdapter {
 	public GccLinker() {
@@ -31,29 +34,29 @@ public class GccLinker extends LinkerAdapter {
 		super.executable = "gcc";
 	}
 
-	public String describeCommand() {
-		StringBuilder command = new StringBuilder(this.getCommand());
+	public Iterator<String> getArgs() {
+		List<String> args = new ArrayList<String>();
 
 		for (AbstractFeature feat : features) {
 			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
-				if (feat instanceof Library) {
-					Library lib = (Library) feat;
+				if (feat instanceof LdTask.Library) {
+					LdTask.Library lib = (LdTask.Library) feat;
 
 					if (lib.getPath() != null) {
-						command.append(" -L").append(lib.getPath().getPath());
+						args.add("-L" + lib.getPath().getPath().replace('\\', '/'));
 					}
 
 					if (lib.getLib() != null) {
-						command.append(" -l").append(lib.getLib());
+						args.add("-l" + lib.getLib());
 					}
 				}
-				else if (feat instanceof LinkerAdapter.Argument) {
-					LinkerAdapter.Argument arg = (LinkerAdapter.Argument) feat;
+				else if (feat instanceof LdTask.Argument) {
+					LdTask.Argument arg = (LdTask.Argument) feat;
 
-					command.append(' ').append(arg.getValue());
+					args.add(arg.getValue());
 				}
-				else if (feat instanceof LinkerAdapter.FileSetArgument) {
-					LinkerAdapter.FileSetArgument arg = (LinkerAdapter.FileSetArgument) feat;
+				else if (feat instanceof LdTask.FileSetArgument) {
+					LdTask.FileSetArgument arg = (LdTask.FileSetArgument) feat;
 
 					DirectoryScanner scanner = arg.getFileSet().getDirectoryScanner(getProject());
 					String[] files = scanner.getIncludedFiles();
@@ -61,14 +64,14 @@ public class GccLinker extends LinkerAdapter {
 						File basePath = scanner.getBasedir();
 
 						// Convert Windows paths to posix compatible paths.
-						command.append(' ').append(new File(basePath, files[i]).getAbsolutePath().replace('\\', '/'));
+						args.add(new File(basePath, files[i]).getAbsolutePath().replace('\\', '/'));
 					}
 				}
 			}
 		}
 
-		command.append(" -o ").append(this.getOutFile());
+		args.add("-o " + this.getOutFile().replace('\\', '/'));
 
-		return command.toString();
+		return args.iterator();
 	}
 }

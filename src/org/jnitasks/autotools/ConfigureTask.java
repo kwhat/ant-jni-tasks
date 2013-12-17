@@ -165,7 +165,5 @@ public class ConfigureTask extends Task {
 		}
 	}
 
-	public static class With extends Enable {
-
-	}
+	public static class With extends Enable { }
 }

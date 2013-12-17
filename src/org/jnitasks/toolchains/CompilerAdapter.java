@@ -21,13 +21,14 @@ import org.apache.tools.ant.ProjectComponent;
 import org.jnitasks.types.AbstractFeature;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
 public abstract class CompilerAdapter extends ProjectComponent {
-	private String command = null;
-	protected String executable = "cc";
-	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
+	private String executable = "cc";
 	private String inFile, outFile;
+
+	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 
 	public void addArg(AbstractFeature arg) {
 		this.features.add(arg);
@@ -47,7 +48,6 @@ public abstract class CompilerAdapter extends ProjectComponent {
 	}
 
 	public void setOutFile(String file) {
-
 		this.outFile = file;
 	}
 
@@ -55,29 +55,15 @@ public abstract class CompilerAdapter extends ProjectComponent {
 		return this.outFile;
 	}
 
-	public void setCommand(String command) {
-		this.command = command;
+	public void setExecutable(String executable) {
+		this.executable = executable;
 	}
 
-	public String getCommand() {
-		String cc = command;
-		if (cc == null) {
-			if ((cc = getProject().getProperty("ant.build.native.compiler")) == null) {
-				if ((cc = System.getenv().get("CC")) == null) {
-					cc = executable;
-				}
-			}
-		}
-
-		return cc;
+	public String getExecutable() {
+		return this.executable;
 	}
 
-	public abstract String describeCommand();
-
-	public String toString() {
-		return describeCommand();
-	}
-
+	public abstract Iterator<String> getArgs();
 
 	public static class Argument extends AbstractFeature {
 		private String value;

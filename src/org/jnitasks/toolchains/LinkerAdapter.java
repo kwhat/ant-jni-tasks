@@ -18,9 +18,9 @@
 package org.jnitasks.toolchains;
 
 import org.apache.tools.ant.ProjectComponent;
-import org.apache.tools.ant.types.FileSet;
 import org.jnitasks.types.AbstractFeature;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 public abstract class LinkerAdapter extends ProjectComponent {
@@ -43,50 +43,13 @@ public abstract class LinkerAdapter extends ProjectComponent {
 		return this.outFile;
 	}
 
-	public void setCommand(String command) {
-		this.command = command;
+	public void setExecutable(String executable) {
+		this.executable = executable;
 	}
 
-	public String getCommand() {
-		String cc = command;
-		if (cc == null) {
-			if ((cc = getProject().getProperty("ant.build.native.compiler")) == null) {
-				if ((cc = System.getenv().get("CC")) == null) {
-					cc = executable;
-				}
-			}
-		}
-
-		return cc;
+	public String getExecutable() {
+		return executable;
 	}
 
-	public abstract String describeCommand();
-
-	public String toString() {
-		return this.describeCommand();
-	}
-
-	public static class Argument extends AbstractFeature {
-		private String value;
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		public String getValue() {
-			return this.value;
-		}
-	}
-
-	public static class FileSetArgument extends AbstractFeature {
-		private FileSet files;
-
-		public void setFileSet(FileSet files) {
-			this.files = files;
-		}
-
-		public FileSet getFileSet() {
-			return this.files;
-		}
-	}
+	public abstract Iterator<String> getArgs();
 }

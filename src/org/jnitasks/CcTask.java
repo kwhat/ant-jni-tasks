@@ -19,39 +19,72 @@ package org.jnitasks;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.ant.taskdefs.*;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.Echo;
+import org.apache.tools.ant.taskdefs.ExecTask;
+import org.apache.tools.ant.taskdefs.Parallel;
+import org.apache.tools.ant.taskdefs.Sequential;
 import org.apache.tools.ant.types.FileSet;
 import org.jnitasks.toolchains.CompilerAdapter;
 import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
-import org.jnitasks.types.Define;
-import org.jnitasks.types.Include;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class CcTask extends MatchingTask {
+public class CcTask extends Task {
 	protected Vector<FileSet> filesets = new Vector<FileSet>();
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 	private int jobs = Runtime.getRuntime().availableProcessors();
 	private File objdir = null;
 	private String toolchain = "gcc";
+	private String host = "";
 
 	public void addFileset(FileSet fileset) {
 		filesets.add(fileset);
 	}
 
-	public void addDefine(Define macro) {
-		features.add(macro);
+	public CcTask.Argument createArg() {
+		CcTask.Argument arg = new CcTask.Argument();
+		features.add(arg);
+
+		return arg;
 	}
 
-	public void addInclude(Include include) {
-		features.add(include);
+	public CcTask.Define createDefine() {
+		CcTask.Define macro = new CcTask.Define();
+		features.add(macro);
+
+		return macro;
+	}
+
+	public CcTask.Include createInclude() {
+		CcTask.Include inc = new CcTask.Include();
+		features.add(inc);
+
+		return inc;
 	}
 
 	public void setToolchain(String toolchain) {
 		this.toolchain = toolchain;
+	}
+
+	public String getToolchain() {
+		return this.toolchain;
+	}
+
+	public void setHost(String host) {
+		if (host == null) {
+			this.host = "";
+		}
+		else {
+			this.host = host;
+		}
+	}
+
+	public String getHost() {
+		return this.host;
 	}
 
 	public void setObjdir(File objdir) {
@@ -72,20 +105,24 @@ public class CcTask extends MatchingTask {
 		}
 	}
 
-	public CompilerAdapter.Argument createArg() {
-		CompilerAdapter.Argument arg = new CompilerAdapter.Argument();
-		features.add(arg);
-
-		return arg;
-	}
-
 	public void execute() {
 		// Setup the compiler.
 		CompilerAdapter compiler = ToolchainFactory.getCompiler(toolchain);
 		compiler.setProject(getProject());
 
+		if (host.length() > 0) {
+			// Prepend the host string to the executable.
+			compiler.setExecutable(host + '-' + compiler.getExecutable());
+		}
+		else if (getProject().getProperty("ant.build.native.compiler") != null) {
+			compiler.setExecutable(getProject().getProperty("ant.build.native.compiler"));
+		}
+		else if (System.getenv().get("CC") != null) {
+			compiler.setExecutable(System.getenv().get("CC"));
+		}
+
 		for (AbstractFeature feat : features) {
-			if (feat.isValidOs()) {
+			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
 				compiler.addArg(feat);
 			}
 		}
@@ -94,7 +131,6 @@ public class CcTask extends MatchingTask {
 		Parallel parallel = (Parallel) this.getProject().createTask("parallel");
 		parallel.setFailOnAny(true);
 		parallel.setThreadCount(jobs);
-
 
 		Iterator<FileSet> iterator = filesets.iterator();
 		while (iterator.hasNext()) {
@@ -107,6 +143,7 @@ public class CcTask extends MatchingTask {
 
 				compiler.setInFile(new File(basePath, files[i]).getAbsolutePath());
 				if (objdir != null) {
+					// If the objdir is set, use that for output.
 					compiler.setOutFile(
 							new File(objdir, files[i].substring(0, files[i].lastIndexOf('.')) + ".o")
 									.getAbsolutePath());
@@ -117,22 +154,29 @@ public class CcTask extends MatchingTask {
 
 				// Print the executed command.
 				Echo echo = (Echo) getProject().createTask("echo");
-				echo.addText(compiler.describeCommand());
 				echo.setTaskName(this.getTaskName());
-				sequential.addTask(echo);
-
+				echo.setAppend(true);
 
 				// Create an exec task to run a shell.  Using the current shell to
 				// execute commands is required for Windows support.
 
-				// FIXME This should be executed without the sh -c...
 				ExecTask shell = (ExecTask) getProject().createTask("exec");
 				shell.setTaskName(this.getTaskName());
-				//shell.setDir(dir);
-				shell.setExecutable("sh");
 				shell.setFailonerror(true);
-				shell.createArg().setValue("-c");
-				shell.createArg().setValue(compiler.describeCommand());
+				//shell.setDir(dir);
+
+				echo.addText(compiler.getExecutable());
+				shell.setExecutable(compiler.getExecutable());
+
+				Iterator<String> args = compiler.getArgs();
+				while (args.hasNext()) {
+					String arg = args.next();
+
+					echo.addText(" " + arg);
+					shell.createArg().setLine(arg);
+				}
+
+				sequential.addTask(echo);
 				sequential.addTask(shell);
 
 				// Add the sequential task containing echo and cc shell command to the parallel task.
@@ -142,5 +186,50 @@ public class CcTask extends MatchingTask {
 
 		// Execute the compile.
 		parallel.execute();
+	}
+
+	public class Argument extends AbstractFeature {
+		private String value;
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+	}
+
+	public class Include extends AbstractFeature implements Cloneable {
+		private String path;
+
+		public void setPath(String path) {
+			this.path = path;
+		}
+
+		public String getPath() {
+			return this.path;
+		}
+	}
+
+	public class Define extends AbstractFeature implements Cloneable {
+		private String name;
+		private String value;
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return this.value;
+		}
 	}
 }
