@@ -3,7 +3,7 @@ package org.jnitasks.autotools;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
-import org.jnitasks.types.ToggleFeature;
+import org.jnitasks.types.AbstractFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class ConfigureTask extends Task {
 	private File dir = null;
 	private File path = null;
 	private File prefix = null;
-	private List<ToggleFeature> flags = new Vector<ToggleFeature>();
+	private List<AbstractFeature> flags = new Vector<AbstractFeature>();
 
     public Enable createEnable() {
 		Enable feat = new Enable();
@@ -26,8 +26,22 @@ public class ConfigureTask extends Task {
 		return feat;
 	}
 
+	public Disable createDisable() {
+		Disable feat = new Disable();
+		flags.add(feat);
+
+		return feat;
+	}
+
 	public With createWith() {
 		With feat = new With();
+		flags.add(feat);
+
+		return feat;
+	}
+
+	public Without createWithout() {
+		Without feat = new Without();
 		flags.add(feat);
 
 		return feat;
@@ -101,28 +115,26 @@ public class ConfigureTask extends Task {
 			command.append(getUnixPath(prefix));
 		}
 
-		// Include arguments for nested Include.
-		Iterator<ToggleFeature> iterator = flags.iterator();
+		// AbstractFeature arguments for nested enable/disable & with/without.
+		Iterator<AbstractFeature> iterator = flags.iterator();
 		while (iterator.hasNext()) {
-			ToggleFeature feature = iterator.next();
+			AbstractFeature feature = iterator.next();
 
 			if (feature.isValidOs() && feature.isIfConditionValid() && feature.isUnlessConditionValid()) {
-				if (feature instanceof With) {
-					if (!feature.isNegated()) {
-						command.append(" --with-").append(((With) feature).getFlag());
-					}
-					else {
-						command.append(" --without-").append(((With) feature).getFlag());
-					}
+				if (feature instanceof Enable) {
+					command.append(" --enable-");
 				}
-				else if (feature instanceof Enable) {
-					if (!feature.isNegated()) {
-						command.append(" --enable-").append(((Enable) feature).getFlag());
-					}
-					else {
-						command.append(" --disable-").append(((Enable) feature).getFlag());
-					}
+				else if (feature instanceof Disable) {
+					command.append(" --disable-");
 				}
+				else if (feature instanceof With) {
+					command.append(" --with-");
+				}
+				else if (feature instanceof Without) {
+					command.append(" --without-");
+				}
+
+				command.append(((ToggleFeature) feature).getFlag());
 			}
 		}
 
@@ -149,7 +161,7 @@ public class ConfigureTask extends Task {
 		shell.execute();
     }
 
-	public static class Enable extends ToggleFeature {
+	private static class ToggleFeature extends AbstractFeature {
 		private String flag;
 
 		public void addText(String flag) {
@@ -165,5 +177,11 @@ public class ConfigureTask extends Task {
 		}
 	}
 
-	public static class With extends Enable { }
+	public static class Enable extends ToggleFeature { }
+
+	public static class Disable extends ToggleFeature { }
+
+	public static class With extends ToggleFeature { }
+
+	public static class Without extends ToggleFeature { }
 }

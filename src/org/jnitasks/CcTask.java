@@ -188,7 +188,7 @@ public class CcTask extends Task {
 		parallel.execute();
 	}
 
-	public class Argument extends AbstractFeature {
+	public static class Argument extends AbstractFeature {
 		private String value;
 
 		public void setValue(String value) {
@@ -200,7 +200,7 @@ public class CcTask extends Task {
 		}
 	}
 
-	public class Include extends AbstractFeature implements Cloneable {
+	public static class Include extends AbstractFeature implements Cloneable {
 		private String path;
 
 		public void setPath(String path) {
@@ -212,7 +212,7 @@ public class CcTask extends Task {
 		}
 	}
 
-	public class Define extends AbstractFeature implements Cloneable {
+	public static class Define extends AbstractFeature implements Cloneable {
 		private String name;
 		private String value;
 

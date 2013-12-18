@@ -4,6 +4,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
+import org.jnitasks.CcTask;
 
 import java.io.File;
 import java.util.Iterator;
@@ -16,7 +17,7 @@ public class AutoreconfTask extends Task {
 	private boolean force = false;
 	private boolean install = false;
 	private boolean verbose = true;
-	private List<Include> includes = new Vector<Include>();
+	private List<AutoreconfTask.Include> includes = new Vector<AutoreconfTask.Include>();
 
 	public void setDir(File dir) {
 		this.dir  = dir;
@@ -37,18 +38,6 @@ public class AutoreconfTask extends Task {
 		return inc;
 	}
 
-	public static class Include extends org.jnitasks.types.Include {
-		private boolean prepend = false;
-
-		public void setPrepend(boolean prepend) {
-			this.prepend = prepend;
-		}
-
-		public boolean isPrepend() {
-			return this.prepend;
-		}
-	}
-
 	@Override
 	public void execute() throws BuildException {
 		// Set the command to execute along with any required arguments.
@@ -64,9 +53,9 @@ public class AutoreconfTask extends Task {
 		}
 
 		// Include arguments for nested Include.
-		Iterator<Include> iterator = includes.iterator();
+		Iterator<AutoreconfTask.Include> iterator = includes.iterator();
 		while (iterator.hasNext()) {
-			Include include = iterator.next();
+			AutoreconfTask.Include include = iterator.next();
 
 			if (include.isValidOs() && include.isIfConditionValid() && include.isUnlessConditionValid()) {
 				if (include.isPrepend()) {
@@ -97,5 +86,17 @@ public class AutoreconfTask extends Task {
 		shell.createArg().setValue(command.toString());
 
 		shell.execute();
+	}
+
+	public static class Include extends CcTask.Include {
+		private boolean prepend = false;
+
+		public void setPrepend(boolean prepend) {
+			this.prepend = prepend;
+		}
+
+		public boolean isPrepend() {
+			return this.prepend;
+		}
 	}
 }

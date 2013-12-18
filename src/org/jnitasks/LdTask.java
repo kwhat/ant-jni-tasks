@@ -118,7 +118,7 @@ public class LdTask extends MatchingTask {
 		shell.execute();
 	}
 
-	public class Argument extends AbstractFeature {
+	public static class Argument extends AbstractFeature {
 		private String value;
 
 		public void setValue(String value) {
@@ -130,7 +130,7 @@ public class LdTask extends MatchingTask {
 		}
 	}
 
-	public class Library extends AbstractFeature {
+	public static class Library extends AbstractFeature {
 		private File path;
 		private String lib;
 
@@ -151,7 +151,7 @@ public class LdTask extends MatchingTask {
 		}
 	}
 
-	public class FileSetArgument extends AbstractFeature {
+	public static class FileSetArgument extends AbstractFeature {
 		private FileSet files;
 
 		public void setFileSet(FileSet files) {
