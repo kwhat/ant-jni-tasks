@@ -43,7 +43,13 @@ public class GccLinker extends LinkerAdapter {
 					LdTask.Library lib = (LdTask.Library) feat;
 
 					if (lib.getPath() != null) {
-						args.add("-L" + lib.getPath().getPath().replace('\\', '/'));
+						String path = lib.getPath().getPath().replace('\\', '/');
+
+						if (path.indexOf(" ") >= 0) {
+							path = '"' + path + '"';
+						}
+
+						args.add("-L" + path);
 					}
 
 					if (lib.getLib() != null) {
@@ -70,7 +76,12 @@ public class GccLinker extends LinkerAdapter {
 			}
 		}
 
-		args.add("-o " + this.getOutFile().replace('\\', '/'));
+		String outfile = this.getOutFile().replace('\\', '/');
+		if (outfile.indexOf(" ") >= 0) {
+			outfile = '"' + outfile + '"';
+		}
+
+		args.add("-o " + outfile);
 
 		return args.iterator();
 	}

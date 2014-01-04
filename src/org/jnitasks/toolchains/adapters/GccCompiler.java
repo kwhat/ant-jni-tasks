@@ -46,9 +46,13 @@ public class GccCompiler extends CompilerAdapter {
 				args.add(macro);
 			}
 			else if (feat instanceof CcTask.Include) {
-				CcTask.Include inc = (CcTask.Include) feat;
+				String inc = ((CcTask.Include) feat).getPath().replace('\\', '/');
 
-				args.add("-I" + inc.getPath().replace('\\', '/'));
+				if (inc.indexOf(" ") >= 0) {
+					inc = '"' + inc + '"';
+				}
+
+				args.add("-I" + inc);
 			}
 			else if (feat instanceof CcTask.Argument) {
 				CcTask.Argument arg = (CcTask.Argument) feat;
@@ -57,8 +61,18 @@ public class GccCompiler extends CompilerAdapter {
 			}
 		}
 
-		args.add("-c " + this.getInFile().replace('\\', '/'));
-		args.add("-o " + this.getOutFile().replace('\\', '/'));
+		String infile = this.getInFile().replace('\\', '/');
+		if (infile.indexOf(" ") >= 0) {
+			infile = '"' + infile + '"';
+		}
+
+		String outfile = this.getOutFile().replace('\\', '/');
+		if (outfile.indexOf(" ") >= 0) {
+			outfile = '"' + outfile + '"';
+		}
+
+		args.add("-c " + infile);
+		args.add("-o " + outfile);
 
 		return args.iterator();
 	}

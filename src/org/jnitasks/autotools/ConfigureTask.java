@@ -6,7 +6,6 @@ import org.apache.tools.ant.taskdefs.ExecTask;
 import org.jnitasks.types.AbstractFeature;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -67,25 +66,6 @@ public class ConfigureTask extends Task {
 		this.prefix = prefix;
 	}
 
-	private String getUnixPath(File path) {
-		String unixPath = null;
-
-		try {
-			unixPath = path.getCanonicalPath();
-		}
-		catch (IOException e) {
-			unixPath = path.getAbsolutePath();
-		}
-
-		unixPath = unixPath.replaceAll("\\\\", "/");
-
-		if (unixPath.charAt(unixPath.length() - 1) != '/') {
-			unixPath += '/';
-		}
-
-		return unixPath;
-	}
-
 	@Override
     public void execute() {
 		// Set the command to execute along with any required arguments.
@@ -94,7 +74,15 @@ public class ConfigureTask extends Task {
 		// FIXME Replace the path and configure command with a variable
 		// similar to <ant antfile="" />
 		if (path != null) {
-			command.append(getUnixPath(path));
+			command.append(path.getAbsolutePath().replace('\\', '/'));
+
+			if (command.charAt(command.length() - 1) != '/') {
+				command.append('/');
+			}
+
+			if (command.indexOf(" ") >= 0) {
+				command.insert(0, '"').append('"');
+			}
 		}
 
 		command.append("configure --verbose");
@@ -112,7 +100,12 @@ public class ConfigureTask extends Task {
 			command.append(" --prefix=");
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
-			command.append(getUnixPath(prefix));
+			String path = prefix.getAbsolutePath().replace('\\', '/');
+			if (path.indexOf(" ") >= 0) {
+				path = '"' + path + '"';
+			}
+
+			command.append(path);
 		}
 
 		// AbstractFeature arguments for nested enable/disable & with/without.
