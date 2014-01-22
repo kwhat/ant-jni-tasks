@@ -23,25 +23,25 @@
     <!-- Project Settings -->
 	<property file="build.num" />
 
-	<property name="ant.project.vendor" 	value="Alexander Barker (alex@1stleg.com)" />
-	<property name="ant.project.version"	value="${build.major}.${build.minor}.${build.revision}" />
+	<property name="ant.project.vendor" value="Alexander Barker (alex@1stleg.com)" />
+    <property name="ant.project.version" value="${ant.build.major}.${ant.build.minor}.${ant.build.revision}" />
 
-    <property name="ant.project.debug" value="true" />
+    <property name="ant.build.debug" value="true" />
     <property name="ant.build.javac.args" value="-Xlint:unchecked" />
 
     <property environment="env" />
 
 	<!-- Path Settings -->
-	<property name="dir.src"	value="${basedir}${file.separator}src" />
-	<property name="dir.test"	value="${basedir}${file.separator}test" />
-	<property name="dir.doc"	value="${basedir}${file.separator}doc" />
-	<property name="dir.jar"	value="${basedir}${file.separator}jar" />
-	<property name="dir.dist"	value="${basedir}${file.separator}dist" />
-	<property name="dir.bin"	value="${basedir}${file.separator}bin" />
+	<property name="dir.src"	value="${basedir}/src" />
+	<property name="dir.test"	value="${basedir}/test" />
+	<property name="dir.doc"	value="${basedir}/doc" />
+	<property name="dir.jar"	value="${basedir}/jar" />
+	<property name="dir.dist"	value="${basedir}/dist" />
+	<property name="dir.bin"	value="${basedir}/bin" />
 
 	<!-- Class Path Settings -->
 	<!-- NOTE Gentoo requires `CLASSPATH="$(java-config -p ant-junit,junit-4)" ant test` -->
-	<path id="project.class.path">
+	<path id="ant.project.class.path">
 		<pathelement location="${dir.bin}" />
 		<!-- pathelement location="${dir.bin}/test" /-->
 		<pathelement location="${dir.jar}" />
@@ -65,7 +65,7 @@
 
 		<javac
 			destdir="${dir.bin}"
-			debug="${ant.project.debug}"
+			debug="${ant.build.debug}"
 			debuglevel="lines,vars,source"
 			deprecation="false"
 			includeantruntime="false"
@@ -74,7 +74,7 @@
 		>
 			<src path="${dir.src}" />
 
-			<classpath refid="project.class.path" />
+			<classpath refid="ant.project.class.path" />
 		</javac>
 	</target>
 
@@ -85,7 +85,7 @@
 
         <javac
             destdir="${dir.bin}"
-            debug="${ant.project.debug}"
+            debug="${ant.build.debug}"
             debuglevel="lines,vars,source"
             deprecation="false"
             includeantruntime="false"
@@ -93,7 +93,7 @@
                 verbose="false">
             <src path="${dir.test}" />
 
-            <classpath refid="project.class.path" />
+            <classpath refid="ant.project.class.path" />
 
             <compilerarg value="${ant.build.javac.args}" />
         </javac>
@@ -101,7 +101,7 @@
 
 		<echo>Performing JUnit tests...</echo>
 		<junit fork="true" printsummary="true" haltonerror="true">
-			<classpath refid="project.class.path" />
+			<classpath refid="ant.project.class.path" />
 
 			<formatter type="brief" usefile="false" />
 			<!-- test name="TestExample" / -->

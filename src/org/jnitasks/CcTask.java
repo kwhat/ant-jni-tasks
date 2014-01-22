@@ -110,6 +110,8 @@ public class CcTask extends Task {
 		CompilerAdapter compiler = ToolchainFactory.getCompiler(toolchain);
 		compiler.setProject(getProject());
 
+		setHost(getProject().getProperty("ant.build.native.host"));
+
 		if (host.length() > 0) {
 			// Prepend the host string to the executable.
 			compiler.setExecutable(host + '-' + compiler.getExecutable());
@@ -122,7 +124,7 @@ public class CcTask extends Task {
 		}
 
 		for (AbstractFeature feat : features) {
-			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
+			if (feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
 				compiler.addArg(feat);
 			}
 		}

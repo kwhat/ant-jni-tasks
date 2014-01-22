@@ -36,6 +36,19 @@ public class LdTask extends MatchingTask {
 	private String toolchain = "gcc";
 	private String host = "";
 
+	public void setHost(String host) {
+		if (host == null) {
+			this.host = "";
+		}
+		else {
+			this.host = host;
+		}
+	}
+
+	public String getHost() {
+		return this.host;
+	}
+
 	public void addFileset(FileSet fileset) {
 		// Wrap FileSet to allow for argument order.
 		LdTask.FileSetArgument arg = new LdTask.FileSetArgument();
@@ -73,6 +86,8 @@ public class LdTask extends MatchingTask {
 		linker.setProject(getProject());
 		linker.setOutFile(outfile);
 
+		setHost(getProject().getProperty("ant.build.native.host"));
+
 		if (host.length() > 0) {
 			// Prepend the host string to the executable.
 			linker.setExecutable(host + '-' + linker.getExecutable());
@@ -85,7 +100,7 @@ public class LdTask extends MatchingTask {
 		}
 
 		for (AbstractFeature feat : features) {
-			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
+			if (feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
 				linker.addArg(feat);
 			}
 		}

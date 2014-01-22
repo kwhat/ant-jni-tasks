@@ -38,7 +38,7 @@ public class GccLinker extends LinkerAdapter {
 		List<String> args = new ArrayList<String>();
 
 		for (AbstractFeature feat : features) {
-			if (feat.isValidOs() && feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
+			if (feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
 				if (feat instanceof LdTask.Library) {
 					LdTask.Library lib = (LdTask.Library) feat;
 

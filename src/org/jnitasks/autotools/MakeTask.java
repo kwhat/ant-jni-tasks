@@ -3,6 +3,7 @@ package org.jnitasks.autotools;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
+import org.apache.tools.ant.types.Environment;
 
 import java.io.File;
 
@@ -27,6 +28,7 @@ public class MakeTask extends Task {
 			command.append(" ").append(target);
 		}
 
+
 		// Print the executed command.
 		Echo echo = (Echo) getProject().createTask("echo");
 		echo.addText(command.toString());
@@ -38,6 +40,51 @@ public class MakeTask extends Task {
 		ExecTask shell = (ExecTask) this.getProject().createTask("exec");
 
 		shell.setTaskName(this.getTaskName());
+
+		String cflags = getProject().getProperty("ant.build.native.cflags");
+		if (cflags != null) {
+			Environment.Variable env = new Environment.Variable();
+			env.setKey("CFLAGS");
+			env.setValue(cflags);
+
+			shell.addEnv(env);
+		}
+
+		String cxxflags = getProject().getProperty("ant.build.native.cxxflags");
+		if (cxxflags != null) {
+			Environment.Variable env = new Environment.Variable();
+			env.setKey("CXXFLAGS");
+			env.setValue(cxxflags);
+
+			shell.addEnv(env);
+		}
+
+		String ldflags = getProject().getProperty("ant.build.native.ldflags");
+		if (ldflags != null) {
+			Environment.Variable env = new Environment.Variable();
+			env.setKey("LDFLAGS");
+			env.setValue(ldflags);
+
+			shell.addEnv(env);
+		}
+
+		String cc = getProject().getProperty("ant.build.native.compiler");
+		if (cc != null) {
+			Environment.Variable env = new Environment.Variable();
+			env.setKey("CC");
+			env.setValue(cc);
+
+			shell.addEnv(env);
+		}
+
+		String ld = getProject().getProperty("ant.build.native.linker");
+		if (ld != null) {
+			Environment.Variable env = new Environment.Variable();
+			env.setKey("LD");
+			env.setValue(ld);
+
+			shell.addEnv(env);
+		}
 
 		shell.setDir(dir);
 		shell.setExecutable("sh");
