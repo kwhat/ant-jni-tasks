@@ -31,7 +31,7 @@ public class GccLinker extends LinkerAdapter {
 	public GccLinker() {
 		super();
 
-		super.executable = "gcc";
+		setExecutable("gcc");
 	}
 
 	public Iterator<String> getArgs() {

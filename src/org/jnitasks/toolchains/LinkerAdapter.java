@@ -25,7 +25,7 @@ import java.util.Vector;
 
 public abstract class LinkerAdapter extends ProjectComponent {
 	private String command = null;
-	protected String executable = "cc";
+	private String executable = "cc";
 
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 	private String outFile = "a.out";

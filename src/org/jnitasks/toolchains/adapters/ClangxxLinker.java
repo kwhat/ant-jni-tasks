@@ -17,10 +17,10 @@
  */
 package org.jnitasks.toolchains.adapters;
 
-public class GxxLinker extends GccLinker {
-	public GxxLinker() {
+public class ClangxxLinker extends GxxLinker {
+	public ClangxxLinker() {
 		super();
 
-		setExecutable("g++");
+		setExecutable("clang++");
 	}
 }
