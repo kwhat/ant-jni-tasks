@@ -95,7 +95,7 @@ public class LdTask extends MatchingTask {
 		else if (getProject().getProperty("ant.build.native.linker") != null) {
 			linker.setExecutable(getProject().getProperty("ant.build.native.compiler"));
 		}
-		else if (System.getenv().get("CC") != null) {
+		else if (System.getenv().get("LD") != null) {
 			linker.setExecutable(System.getenv().get("LD"));
 		}
 

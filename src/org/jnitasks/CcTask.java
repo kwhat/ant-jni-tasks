@@ -142,47 +142,55 @@ public class CcTask extends Task {
 			String[] files = scanner.getIncludedFiles();
 			for(int i = 0; i < files.length; i++) {
 				File basePath = scanner.getBasedir();
+				File inFile = new File(basePath, files[i]);
+				compiler.setInFile(inFile.getAbsolutePath());
 
-				compiler.setInFile(new File(basePath, files[i]).getAbsolutePath());
+
+				File outFile;
 				if (objdir != null) {
 					// If the objdir is set, use that for output.
-					compiler.setOutFile(
-							new File(objdir, files[i].substring(0, files[i].lastIndexOf('.')) + ".o")
-									.getAbsolutePath());
+					outFile = new File(objdir, files[i].substring(0, files[i].lastIndexOf('.')) + ".o");
+
+					compiler.setOutFile(outFile.getAbsolutePath());
+				}
+				else {
+					outFile = new File(compiler.getOutFile());
 				}
 
+				// Check to see if the source file has been modified more recently than the object file.
+				if (inFile.lastModified() >= outFile.lastModified()) {
+					Sequential sequential = (Sequential) this.getProject().createTask("sequential");
 
-				Sequential sequential = (Sequential) this.getProject().createTask("sequential");
+					// Print the executed command.
+					Echo echo = (Echo) getProject().createTask("echo");
+					echo.setTaskName(this.getTaskName());
+					echo.setAppend(true);
 
-				// Print the executed command.
-				Echo echo = (Echo) getProject().createTask("echo");
-				echo.setTaskName(this.getTaskName());
-				echo.setAppend(true);
+					// Create an exec task to run a shell.  Using the current shell to
+					// execute commands is required for Windows support.
 
-				// Create an exec task to run a shell.  Using the current shell to
-				// execute commands is required for Windows support.
+					ExecTask shell = (ExecTask) getProject().createTask("exec");
+					shell.setTaskName(this.getTaskName());
+					shell.setFailonerror(true);
+					//shell.setDir(dir);
 
-				ExecTask shell = (ExecTask) getProject().createTask("exec");
-				shell.setTaskName(this.getTaskName());
-				shell.setFailonerror(true);
-				//shell.setDir(dir);
+					echo.addText(compiler.getExecutable());
+					shell.setExecutable(compiler.getExecutable());
 
-				echo.addText(compiler.getExecutable());
-				shell.setExecutable(compiler.getExecutable());
+					Iterator<String> args = compiler.getArgs();
+					while (args.hasNext()) {
+						String arg = args.next();
 
-				Iterator<String> args = compiler.getArgs();
-				while (args.hasNext()) {
-					String arg = args.next();
+						echo.addText(" " + arg);
+						shell.createArg().setLine(arg);
+					}
 
-					echo.addText(" " + arg);
-					shell.createArg().setLine(arg);
+					sequential.addTask(echo);
+					sequential.addTask(shell);
+
+					// Add the sequential task containing echo and cc shell command to the parallel task.
+					parallel.addTask(sequential);
 				}
-
-				sequential.addTask(echo);
-				sequential.addTask(shell);
-
-				// Add the sequential task containing echo and cc shell command to the parallel task.
-				parallel.addTask(sequential);
 			}
 		}
 
