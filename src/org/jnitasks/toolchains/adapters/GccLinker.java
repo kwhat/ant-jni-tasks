@@ -76,7 +76,7 @@ public class GccLinker extends LinkerAdapter {
 			}
 		}
 
-		String outfile = this.getOutFile().replace('\\', '/');
+		String outfile = this.getOutFile().getPath().replace('\\', '/');
 		if (outfile.indexOf(" ") >= 0) {
 			outfile = '"' + outfile + '"';
 		}

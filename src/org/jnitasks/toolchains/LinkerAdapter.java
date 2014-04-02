@@ -17,9 +17,13 @@
  */
 package org.jnitasks.toolchains;
 
+import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.ProjectComponent;
+import org.jnitasks.LdTask;
 import org.jnitasks.types.AbstractFeature;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -28,19 +32,40 @@ public abstract class LinkerAdapter extends ProjectComponent {
 	private String executable = "cc";
 
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
-	private String outFile = "a.out";
+	private File outFile = new File("a.out");
 
 	public void addArg(AbstractFeature arg) {
 		this.features.add(arg);
 	}
 
-	public void setOutFile(String file) {
-
+	public void setOutFile(File file) {
 		this.outFile = file;
 	}
 
-	public String getOutFile() {
+	public File getOutFile() {
 		return this.outFile;
+	}
+
+	public Iterator<File> getInFiles() {
+		ArrayList<File> inFiles = new ArrayList<File>(features.size());
+
+		for (AbstractFeature feat : features) {
+			if (feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
+				if (feat instanceof LdTask.FileSetArgument) {
+					LdTask.FileSetArgument arg = (LdTask.FileSetArgument) feat;
+
+					DirectoryScanner scanner = arg.getFileSet().getDirectoryScanner(getProject());
+					String[] files = scanner.getIncludedFiles();
+					for(int i = 0; i < files.length; i++) {
+						File basePath = scanner.getBasedir();
+
+						inFiles.add(new File(basePath, files[i]));
+					}
+				}
+			}
+		}
+
+		return inFiles.iterator();
 	}
 
 	public void setExecutable(String executable) {

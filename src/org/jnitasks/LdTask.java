@@ -32,7 +32,7 @@ import java.util.Vector;
 
 public class LdTask extends MatchingTask {
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
-	private String outfile = null;
+	private File outFile = null;
 	private String toolchain = "gcc";
 	private String host = "";
 
@@ -65,8 +65,8 @@ public class LdTask extends MatchingTask {
 		this.toolchain = toolchain;
 	}
 
-	public void setOutfile(String outfile) {
-		this.outfile = outfile;
+	public void setOutfile(File outFile) {
+		this.outFile = outFile;
 	}
 
 	public LdTask.Argument createArg() {
@@ -77,14 +77,14 @@ public class LdTask extends MatchingTask {
 	}
 
 	public void execute() {
-		if (outfile == null) {
-			throw new BuildException("The outfile attribute is required");
+		if (outFile == null) {
+			throw new BuildException("The outFile attribute is required");
 		}
 
 		// Setup the compiler.
 		LinkerAdapter linker = ToolchainFactory.getLinker(toolchain);
 		linker.setProject(getProject());
-		linker.setOutFile(outfile);
+		linker.setOutFile(outFile);
 
 		setHost(getProject().getProperty("ant.build.native.host"));
 
@@ -105,32 +105,43 @@ public class LdTask extends MatchingTask {
 			}
 		}
 
+		long newest = 0;
+		Iterator<File> inFile = linker.getInFiles();
+		while (inFile.hasNext()) {
+			long modified = inFile.next().lastModified();
 
-		// Print the executed command.
-		Echo echo = (Echo) getProject().createTask("echo");
-		echo.setTaskName(this.getTaskName());
-		echo.setAppend(true);
-
-		// Create an exec task to run a shell.  Using the current shell to
-		// execute commands is required for Windows support.
-		ExecTask shell = (ExecTask) getProject().createTask("exec");
-		shell.setTaskName(this.getTaskName());
-		shell.setFailonerror(true);
-		//shell.setDir(dir);
-
-		echo.addText(linker.getExecutable());
-		shell.setExecutable(linker.getExecutable());
-
-		Iterator<String> args = linker.getArgs();
-		while (args.hasNext()) {
-			String arg = args.next();
-
-			echo.addText(" " + arg);
-			shell.createArg().setLine(arg);
+			if (newest < modified) {
+				newest = modified;
+			}
 		}
 
-		echo.execute();
-		shell.execute();
+		if (newest >= outFile.lastModified()) {
+			// Print the executed command.
+			Echo echo = (Echo) getProject().createTask("echo");
+			echo.setTaskName(this.getTaskName());
+			echo.setAppend(true);
+
+			// Create an exec task to run a shell.  Using the current shell to
+			// execute commands is required for Windows support.
+			ExecTask shell = (ExecTask) getProject().createTask("exec");
+			shell.setTaskName(this.getTaskName());
+			shell.setFailonerror(true);
+			//shell.setDir(dir);
+
+			echo.addText(linker.getExecutable());
+			shell.setExecutable(linker.getExecutable());
+
+			Iterator<String> args = linker.getArgs();
+			while (args.hasNext()) {
+				String arg = args.next();
+
+				echo.addText(" " + arg);
+				shell.createArg().setLine(arg);
+			}
+
+			echo.execute();
+			shell.execute();
+		}
 	}
 
 	public static class Argument extends AbstractFeature {

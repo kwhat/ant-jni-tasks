@@ -143,7 +143,7 @@ public class CcTask extends Task {
 			for(int i = 0; i < files.length; i++) {
 				File basePath = scanner.getBasedir();
 				File inFile = new File(basePath, files[i]);
-				compiler.setInFile(inFile.getAbsolutePath());
+				compiler.setInFile(inFile);
 
 
 				File outFile;
@@ -151,10 +151,10 @@ public class CcTask extends Task {
 					// If the objdir is set, use that for output.
 					outFile = new File(objdir, files[i].substring(0, files[i].lastIndexOf('.')) + ".o");
 
-					compiler.setOutFile(outFile.getAbsolutePath());
+					compiler.setOutFile(outFile);
 				}
 				else {
-					outFile = new File(compiler.getOutFile());
+					outFile = compiler.getOutFile();
 				}
 
 				// Check to see if the source file has been modified more recently than the object file.

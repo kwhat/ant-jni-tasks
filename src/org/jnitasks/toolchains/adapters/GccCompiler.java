@@ -61,12 +61,12 @@ public class GccCompiler extends CompilerAdapter {
 			}
 		}
 
-		String infile = this.getInFile().replace('\\', '/');
+		String infile = this.getInFile().getPath().replace('\\', '/');
 		if (infile.indexOf(" ") >= 0) {
 			infile = '"' + infile + '"';
 		}
 
-		String outfile = this.getOutFile().replace('\\', '/');
+		String outfile = this.getOutFile().getPath().replace('\\', '/');
 		if (outfile.indexOf(" ") >= 0) {
 			outfile = '"' + outfile + '"';
 		}

@@ -20,13 +20,14 @@ package org.jnitasks.toolchains;
 import org.apache.tools.ant.ProjectComponent;
 import org.jnitasks.types.AbstractFeature;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
 public abstract class CompilerAdapter extends ProjectComponent {
 	private String executable = "cc";
-	private String inFile, outFile;
+	private File inFile, outFile;
 
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 
@@ -38,20 +39,20 @@ public abstract class CompilerAdapter extends ProjectComponent {
 		this.features.addAll(args);
 	}
 
-	public void setInFile(String file) {
+	public void setInFile(File file) {
 		this.inFile = file;
-		this.outFile = inFile.substring(0, inFile.lastIndexOf('.')) + ".o";
+		this.outFile = new File(file.getPath().substring(0, file.getPath().lastIndexOf('.')) + ".o");
 	}
 
-	public String getInFile() {
+	public File getInFile() {
 		return this.inFile;
 	}
 
-	public void setOutFile(String file) {
+	public void setOutFile(File file) {
 		this.outFile = file;
 	}
 
-	public String getOutFile() {
+	public File getOutFile() {
 		return this.outFile;
 	}
 
