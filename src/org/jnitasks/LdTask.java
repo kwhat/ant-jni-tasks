@@ -88,15 +88,15 @@ public class LdTask extends MatchingTask {
 
 		setHost(getProject().getProperty("ant.build.native.host"));
 
-		if (host.length() > 0) {
-			// Prepend the host string to the executable.
-			linker.setExecutable(host + '-' + linker.getExecutable());
-		}
-		else if (getProject().getProperty("ant.build.native.linker") != null) {
+		if (getProject().getProperty("ant.build.native.linker") != null) {
 			linker.setExecutable(getProject().getProperty("ant.build.native.compiler"));
 		}
 		else if (System.getenv().get("LD") != null) {
 			linker.setExecutable(System.getenv().get("LD"));
+		}
+		else if (host.length() > 0) {
+			// Prepend the host string to the executable.
+			linker.setExecutable(host + '-' + linker.getExecutable());
 		}
 
 		for (AbstractFeature feat : features) {

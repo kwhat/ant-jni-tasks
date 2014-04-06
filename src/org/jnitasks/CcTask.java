@@ -112,15 +112,15 @@ public class CcTask extends Task {
 
 		setHost(getProject().getProperty("ant.build.native.host"));
 
-		if (host.length() > 0) {
-			// Prepend the host string to the executable.
-			compiler.setExecutable(host + '-' + compiler.getExecutable());
-		}
-		else if (getProject().getProperty("ant.build.native.compiler") != null) {
+		if (getProject().getProperty("ant.build.native.compiler") != null) {
 			compiler.setExecutable(getProject().getProperty("ant.build.native.compiler"));
 		}
 		else if (System.getenv().get("CC") != null) {
 			compiler.setExecutable(System.getenv().get("CC"));
+		}
+		else if (host.length() > 0) {
+			// Prepend the host string to the executable.
+			compiler.setExecutable(host + '-' + compiler.getExecutable());
 		}
 
 		for (AbstractFeature feat : features) {
