@@ -21,7 +21,7 @@ public class MakeTask extends Task {
 
 		// Take care of the optional arguments.
 		if (jobs != null) {
-			command.append(" -j").append(jobs);
+			command.append(" -j ").append(jobs);
 		}
 
 		if (target != null) {
