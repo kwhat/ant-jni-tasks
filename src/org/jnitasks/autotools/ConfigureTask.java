@@ -14,6 +14,8 @@ import java.util.Vector;
 public class ConfigureTask extends Task {
 	private String build = null;
 	private String host = null;
+	private String target = null;
+
 	private File dir = null;
 	private File path = null;
 	private File prefix = null;
@@ -53,6 +55,10 @@ public class ConfigureTask extends Task {
 
 	public void setHost(String host) {
 		this.host = host;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
 	public void setDir(File dir) {
@@ -100,6 +106,13 @@ public class ConfigureTask extends Task {
 		}
 		else if (getProject().getProperty("ant.build.native.host") != null) {
 			command.append(" --host=").append(getProject().getProperty("ant.build.native.host"));
+		}
+
+		if (this.target != null) {
+			command.append(" --target=").append(this.target);
+		}
+		else if (getProject().getProperty("ant.build.native.target") != null) {
+			command.append(" --target=").append(getProject().getProperty("ant.build.native.target"));
 		}
 
 		// Take care of the optional arguments.
