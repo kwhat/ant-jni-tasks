@@ -22,14 +22,15 @@
 <project name="JNITasks" default="all" basedir=".">
     <!-- Project Settings -->
 	<property file="build.num" />
+	<tstamp>
+		<format property="ant.build.revision" pattern="yyyyMMdd" />
+	</tstamp>
 
 	<property name="ant.project.vendor" value="Alexander Barker (alex@1stleg.com)" />
     <property name="ant.project.version" value="${ant.build.major}.${ant.build.minor}.${ant.build.revision}" />
 
-    <property name="ant.build.debug" value="true" />
-    <property name="ant.build.javac.args" value="-Xlint:unchecked" />
-
-    <property environment="env" />
+	<property file="build.properties" />
+	<property environment="env" />
 
 	<!-- Path Settings -->
 	<property name="dir.src"	value="${basedir}/src" />
@@ -75,6 +76,8 @@
 			<src path="${dir.src}" />
 
 			<classpath refid="ant.project.class.path" />
+
+			<compilerarg line="${ant.build.javac.args}" />
 		</javac>
 	</target>
 
@@ -95,7 +98,7 @@
 
             <classpath refid="ant.project.class.path" />
 
-            <compilerarg value="${ant.build.javac.args}" />
+            <compilerarg line="${ant.build.javac.args}" />
         </javac>
 
 
