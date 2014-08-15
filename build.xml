@@ -83,23 +83,23 @@
 
 
 	<target name="test" description="Perform JUnit tests.">
-        <echo>Compiling JUnit source...</echo>
-        <mkdir dir="${dir.bin}" />
+		<echo>Compiling JUnit source...</echo>
+		<mkdir dir="${dir.bin}" />
 
-        <javac
-            destdir="${dir.bin}"
-            debug="${ant.build.debug}"
-            debuglevel="lines,vars,source"
-            deprecation="false"
-            includeantruntime="false"
-                listfiles="true"
-                verbose="false">
-            <src path="${dir.test}" />
+		<javac
+			destdir="${dir.bin}"
+			debug="${ant.build.debug}"
+			debuglevel="lines,vars,source"
+			deprecation="false"
+			includeantruntime="false"
+			listfiles="true"
+			verbose="false"
+		>
+			<compilerarg line="${ant.build.javac.args}" />
+			<src path="${dir.test}" />
 
-            <classpath refid="ant.project.class.path" />
-
-            <compilerarg line="${ant.build.javac.args}" />
-        </javac>
+			<classpath refid="ant.project.class.path" />
+		</javac>
 
 
 		<echo>Performing JUnit tests...</echo>
