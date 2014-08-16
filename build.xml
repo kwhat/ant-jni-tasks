@@ -79,6 +79,11 @@
 
 			<classpath refid="ant.project.class.path" />
 		</javac>
+
+		<!-- Copy over the antlib.xml definitions. -->
+		<copy overwrite="true" todir="${dir.bin}">
+			<fileset dir="${dir.src}" includes="**/antlib.xml" />
+		</copy>
 	</target>
 
 
