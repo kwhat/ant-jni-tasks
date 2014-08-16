@@ -73,11 +73,11 @@
 			listfiles="true"
 			verbose="false"
 		>
+			<compilerarg line="${ant.build.javac.args}" />
+
 			<src path="${dir.src}" />
 
 			<classpath refid="ant.project.class.path" />
-
-			<compilerarg line="${ant.build.javac.args}" />
 		</javac>
 	</target>
 
@@ -96,6 +96,7 @@
 			verbose="false"
 		>
 			<compilerarg line="${ant.build.javac.args}" />
+
 			<src path="${dir.test}" />
 
 			<classpath refid="ant.project.class.path" />
@@ -127,7 +128,7 @@
 
 			<manifest>
 				<section name="org/jnitasks">
-					<attribute name="Implementation-Title" value="${ant.project.name} Library" />
+					<attribute name="Implementation-Title" value="${ant.project.name}" />
 					<attribute name="Implementation-Version" value="${ant.project.version}" />
 					<attribute name="Implementation-Vendor" value="${ant.project.vendor}" />
 				</section>
@@ -137,7 +138,7 @@
 
 
 	<target name="javadoc" description="Generates javadoc api documentation.">
-		<echo level="info">Generating API Documenation...</echo>
+		<echo level="info">Generating API Documentation...</echo>
 		<mkdir dir="${dir.doc}" />
 
 		<javadoc destdir="${dir.doc}" windowtitle="${ant.project.name}" author="true" version="true" use="true">

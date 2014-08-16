@@ -25,9 +25,9 @@ import org.apache.tools.ant.types.Environment;
 import java.io.File;
 
 public class MakeTask extends Task {
-	private File dir;
-	private Integer jobs;
-	private String target;
+	private File dir = null;
+	private Integer jobs = null;
+	private String target = null;
 
 	@Override
     public void execute() {
