@@ -25,7 +25,6 @@
     <typedef name="make" classname="org.jnitasks.autotools.MakeTask" />
 
     <typedef name="pkgconfig" classname="org.jnitasks.pkgconfig.PkgConfigTask" />
-	<typedef name="lipo" classname="org.jnitasks.lipo.LipoTask" />
 
     <typedef name="cc" classname="org.jnitasks.CcTask" />
     <typedef name="ld" classname="org.jnitasks.LdTask" />
