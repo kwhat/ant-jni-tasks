@@ -33,7 +33,7 @@ public class AutoreconfTask extends Task {
 	private File dir;
 	private boolean force = false;
 	private boolean install = false;
-	private boolean verbose = true;
+	private boolean quiet = false;
 	private List<AutoreconfTask.Include> includes = new Vector<AutoreconfTask.Include>();
 
 	public void setDir(File dir) {
@@ -48,6 +48,10 @@ public class AutoreconfTask extends Task {
 		this.install = install;
 	}
 
+	public void setQuiet(boolean quiet) {
+		this.quiet = quiet;
+	}
+
 	public AutoreconfTask.Include createInclude() {
 		Include inc = new Include();
 		includes.add(inc);
@@ -58,9 +62,13 @@ public class AutoreconfTask extends Task {
 	@Override
 	public void execute() throws BuildException {
 		// Set the command to execute along with any required arguments.
-		StringBuilder command = new StringBuilder("autoreconf --verbose");
+		StringBuilder command = new StringBuilder("autoreconf");
 
 		// Take care of the optional arguments.
+		if (!this.quiet) {
+			command.append(" --verbose");
+		}
+
 		if (this.force) {
 			command.append(" --force");
 		}
