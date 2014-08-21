@@ -2,7 +2,7 @@
 ===========================================================================
 
 ## About
-JNITasks are a set if simple Ant tasks to reliably build Java Native Interface (JNI) projects and their dependencies.
+JNITasks are a set of simple Ant tasks to reliably build Java Native Interface (JNI) projects and their dependencies.
 
 ### Supported Toolchains
 * GNU C Compiler
@@ -24,13 +24,12 @@ Simply add the following to your ant project:
 ```
 
 ## Available Tasks
-
-[autoreconf](doc/AUTORECONF.md)
-[configure](#)
-[make](#)
-[pkg-config](#)
-[cc](#)
-[ld](#)
+* [autoreconf](doc/AUTORECONF.md)
+* [configure](doc/CONFIGURE.md)
+* [make](doc/MAKE.md)
+* [pkg-config](doc/PKGCONFIG.md)
+* [cc](doc/CC.md)
+* [ld](doc/LD.md)
 
 The following are projects that currently use JNITasks that you may use as an example.
 
