@@ -28,9 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-// TODO Add support for -I, -B  via TaskContainer and DirSet
 public class AutoreconfTask extends Task {
-	private File dir;
+	private File dir = null;
 	private boolean force = false;
 	private boolean install = false;
 	private boolean quiet = false;
