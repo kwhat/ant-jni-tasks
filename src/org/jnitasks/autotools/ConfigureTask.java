@@ -29,22 +29,165 @@ import java.util.List;
 import java.util.Vector;
 
 public class ConfigureTask extends Task {
+	private File dir = null;
+	private File path = null;
+
+	// Configuration
+	private boolean quiet = false;
+	private File cache = null;
+	private boolean create = true;
+	private File src = null;
+
+	// Installation directories
+	private File prefix = null;
+	private File exec_prefix = null;
+
+	// Fine tuning of the installation directories
+	private File bin = null;
+	private File sbin = null;
+	private File libexec = null;
+	private File sysconf = null;
+	private File sharedstate = null;
+	private File localstate = null;
+	private File lib = null;
+	private File include = null;
+	private File oldinclude = null;
+	private File dataroot = null;
+	private File data = null;
+	private File info = null;
+	private File locale = null;
+	private File man = null;
+	private File doc = null;
+	private File html = null;
+	private File dvi = null;
+	private File pdf = null;
+	private File ps = null;
+
+	// Program names
+	private String programPrefix = null;
+	private String programSuffix = null;
+	private String programTransformName = null;
+
+	// System types
 	private String build = null;
 	private String host = null;
 	private String target = null;
 
-	private File dir = null;
-	private File path = null;
-	private File prefix = null;
 	private List<AbstractFeature> flags = new Vector<AbstractFeature>();
+	private List<Environment.Variable> env = new Vector<Environment.Variable>();
 
-    public Enable createEnable() {
+	public void setDir(File dir) {
+		this.dir = dir;
+	}
+	public void setPath(File path) {
+		this.path = path;
+	}
+
+	public void setQuiet(boolean quiet) {
+		this.quiet = quiet;
+	}
+	public void setCache(File cache) {
+		this.cache = cache;
+	}
+	public void setCreate(boolean create) {
+		this.create = create;
+	}
+	public void setSrc(File src) {
+		this.src = src;
+	}
+
+	public void setPrefix(File prefix) {
+		this.prefix = prefix;
+	}
+	public void setExecprefix(File exec_prefix) {
+		this.exec_prefix = exec_prefix;
+	}
+
+	public void setBin(File bin) {
+		this.bin = bin;
+	}
+	public void setSbin(File sbin) {
+		this.sbin = sbin;
+	}
+	public void setLibexec(File libexec) {
+		this.libexec = libexec;
+	}
+	public void setSysconf(File sysconf) {
+		this.sysconf = sysconf;
+	}
+	public void setSharedstate(File sharedstate) {
+		this.sharedstate = sharedstate;
+	}
+	public void setLocalstate(File localstate) {
+		this.localstate = localstate;
+	}
+	public void setLib(File lib) {
+		this.lib = lib;
+	}
+	public void setInclude(File include) {
+		this.include = include;
+	}
+	public void setOldinclude(File oldinclude) {
+		this.oldinclude = oldinclude;
+	}
+	public void setDataroot(File dataroot) {
+		this.dataroot = dataroot;
+	}
+	public void setData(File data) {
+		this.data = data;
+	}
+	public void setInfo(File info) {
+		this.info = info;
+	}
+	public void setLocale(File locale) {
+		this.locale = locale;
+	}
+	public void setMan(File man) {
+		this.man = man;
+	}
+	public void setDoc(File doc) {
+		this.doc = doc;
+	}
+	public void setHtml(File html) {
+		this.html = html;
+	}
+	public void setDvi(File dvi) {
+		this.dvi = dvi;
+	}
+	public void setPdf(File pdf) {
+		this.pdf = pdf;
+	}
+	public void setPs(File ps) {
+		this.ps = ps;
+	}
+
+	public void setProgramprefix(String programPrefix) {
+		this.programPrefix = programPrefix;
+	}
+	public void setProgramsuffix(String programSuffix) {
+		this.programSuffix = programSuffix;
+	}
+	public void setProgramtransformname(String programTransformName) {
+		this.programTransformName = programTransformName;
+	}
+
+	public void setBuild(String build) {
+		this.build = build;
+	}
+	public void setHost(String host) {
+		this.host = host;
+	}
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
+	// Optional Features
+	public Enable createEnable() {
 		Enable feat = new Enable();
 		flags.add(feat);
 
 		return feat;
 	}
-
 	public Disable createDisable() {
 		Disable feat = new Disable();
 		flags.add(feat);
@@ -52,13 +195,13 @@ public class ConfigureTask extends Task {
 		return feat;
 	}
 
+	// Optional Packages
 	public With createWith() {
 		With feat = new With();
 		flags.add(feat);
 
 		return feat;
 	}
-
 	public Without createWithout() {
 		Without feat = new Without();
 		flags.add(feat);
@@ -66,28 +209,9 @@ public class ConfigureTask extends Task {
 		return feat;
 	}
 
-	public void setBuild(String build) {
-		this.build = build;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public void setTarget(String target) {
-		this.target = target;
-	}
-
-	public void setDir(File dir) {
-		this.dir = dir;
-	}
-
-	public void setPath(File path) {
-		this.path = path;
-	}
-
-	public void setPrefix(File prefix) {
-		this.prefix = prefix;
+	// Environment Variables
+	public void addEnv(Environment.Variable var) {
+		this.env.add(var);
 	}
 
 	@Override
@@ -100,16 +224,306 @@ public class ConfigureTask extends Task {
 		if (path != null) {
 			command.append(path.getAbsolutePath().replace('\\', '/'));
 
+			// Make sure it ends in a path separator.
 			if (command.charAt(command.length() - 1) != '/') {
 				command.append('/');
 			}
 
+			// Quote the string if it contains a space.
 			if (command.indexOf(" ") >= 0) {
 				command.insert(0, '"').append('"');
 			}
 		}
 
-		command.append("configure --verbose");
+		command.append("configure");
+
+		if (this.quiet) {
+			command.append(" --quiet");
+		}
+
+		if (this.cache != null) {
+			command.append(" --cache-file=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = cache.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (!this.create) {
+			command.append(" --no-create");
+		}
+
+		if (this.src != null) {
+			command.append(" --srcdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = cache.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+
+		if (this.prefix != null) {
+			command.append(" --prefix=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = prefix.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.exec_prefix != null) {
+			command.append(" --exec-prefix=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = exec_prefix.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+
+		if (this.bin != null) {
+			command.append(" --bindir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = bin.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.sbin != null) {
+			command.append(" --bindir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = sbin.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.libexec != null) {
+			command.append(" --libexecdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = libexec.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.sysconf != null) {
+			command.append(" --sysconfdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = sysconf.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.sharedstate != null) {
+			command.append(" --sharedstatedir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = sharedstate.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.localstate != null) {
+			command.append(" --localstatedir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = localstate.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.lib != null) {
+			command.append(" --libdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = lib.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.include != null) {
+			command.append(" --includedir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = include.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.oldinclude != null) {
+			command.append(" --oldincludedir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = oldinclude.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.dataroot != null) {
+			command.append(" --datarootdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = dataroot.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.info != null) {
+			command.append(" --infodir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = info.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.locale != null) {
+			command.append(" --localedir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = locale.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.man != null) {
+			command.append(" --mandir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = man.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.doc != null) {
+			command.append(" --docdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = doc.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.html != null) {
+			command.append(" --htmldir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = html.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.dvi != null) {
+			command.append(" --dvidir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = dvi.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.pdf != null) {
+			command.append(" --pdfdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = pdf.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (this.ps != null) {
+			command.append(" --psdir=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = ps.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+
+		if (this.programPrefix != null) {
+			command.append(" --program-prefix=").append(this.programPrefix);
+		}
+
+		if (this.programSuffix != null) {
+			command.append(" --program-suffix=").append(this.programSuffix);
+		}
+
+		if (this.programTransformName != null) {
+			command.append(" --program-transform-name=").append(this.programTransformName);
+		}
+
 
 		if (this.build != null) {
 			command.append(" --build=").append(this.build);
@@ -132,18 +546,6 @@ public class ConfigureTask extends Task {
 			command.append(" --target=").append(getProject().getProperty("ant.build.native.target"));
 		}
 
-		// Take care of the optional arguments.
-		if (this.prefix != null) {
-			command.append(" --prefix=");
-			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
-			// TODO Make sure the drive letter is lower case.
-			String path = prefix.getAbsolutePath().replace('\\', '/');
-			if (path.indexOf(" ") >= 0) {
-				path = '"' + path + '"';
-			}
-
-			command.append(path);
-		}
 
 		// AbstractFeature arguments for nested enable/disable & with/without.
 		Iterator<AbstractFeature> iterator = flags.iterator();
@@ -168,6 +570,7 @@ public class ConfigureTask extends Task {
 			}
 		}
 
+
 		// Print the executed command.
 		Echo echo = (Echo) getProject().createTask("echo");
 		echo.addText(command.toString());
@@ -180,49 +583,10 @@ public class ConfigureTask extends Task {
 
 		shell.setTaskName(this.getTaskName());
 
-		String cflags = getProject().getProperty("ant.build.native.cflags");
-		if (cflags != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("CFLAGS");
-			env.setValue(cflags);
-
-			shell.addEnv(env);
-		}
-
-		String cxxflags = getProject().getProperty("ant.build.native.cxxflags");
-		if (cxxflags != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("CXXFLAGS");
-			env.setValue(cxxflags);
-
-			shell.addEnv(env);
-		}
-
-		String ldflags = getProject().getProperty("ant.build.native.ldflags");
-		if (ldflags != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("LDFLAGS");
-			env.setValue(ldflags);
-
-			shell.addEnv(env);
-		}
-
-		String cc = getProject().getProperty("ant.build.native.compiler");
-		if (cc != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("CC");
-			env.setValue(cc);
-
-			shell.addEnv(env);
-		}
-
-		String ld = getProject().getProperty("ant.build.native.linker");
-		if (ld != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("LD");
-			env.setValue(ld);
-
-			shell.addEnv(env);
+		// Environment.Variable arguments for nested env items.
+		Iterator<Environment.Variable> envItems = env.iterator();
+		while (envItems.hasNext()) {
+			shell.addEnv(envItems.next());
 		}
 
 		shell.setDir(dir);
