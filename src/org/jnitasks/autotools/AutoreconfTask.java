@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Vector;
 
 public class AutoreconfTask extends Task {
+	private static final String cmd = "autoreconf";
+
 	private File dir = null;
 	private boolean force = false;
 	private boolean install = false;
@@ -61,7 +63,7 @@ public class AutoreconfTask extends Task {
 	@Override
 	public void execute() throws BuildException {
 		// Set the command to execute along with any required arguments.
-		StringBuilder command = new StringBuilder("autoreconf");
+		StringBuilder command = new StringBuilder(cmd);
 
 		// Take care of the optional arguments.
 		if (!this.quiet) {

@@ -20,14 +20,47 @@ package org.jnitasks.autotools;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
-import org.apache.tools.ant.types.Environment;
+import org.jnitasks.types.AbstractFeature;
 
 import java.io.File;
+import java.util.Vector;
 
 public class MakeTask extends Task {
 	private File dir = null;
+
+	private boolean force = false;
+
+	private String debug = null;
+	private boolean override = false;
+	private File makefile = null;
+	private boolean ignoreErrors = false;
 	private Integer jobs = null;
+	private boolean keepGoing = false;
+	private Float load = null;
+
+	protected Vector<MakeTask.Include> features = new Vector<MakeTask.Include>();
+
 	private String target = null;
+
+	public void setDir(File dir) {
+		this.dir = dir;
+	}
+
+	public void setJobs(String jobs) {
+		if (jobs.equalsIgnoreCase("auto")) {
+			this.jobs = Runtime.getRuntime().availableProcessors();
+		}
+		else {
+			// FIXME else throw exception!
+			this.jobs = Integer.parseInt(jobs);
+		}
+	}
+
+	public void setTarget(String target) {
+		this.target = target.replaceAll(",", " ");
+	}
+
+
 
 	@Override
     public void execute() {
@@ -35,6 +68,43 @@ public class MakeTask extends Task {
 		StringBuilder command = new StringBuilder();
 
 		command.append("make");
+
+		if (debug != null) {
+			if (debug.trim().length() > 0) {
+				command.append(" --debug=").append(debug);
+			}
+			else {
+				command.append(" -d");
+			}
+		}
+
+		if (overrides) {
+			command.append(" -e");
+		}
+
+		if (recon) {
+			command.append(" -n");
+		}
+
+		if (quiet) {
+			command.append(" -s");
+		}
+
+		if (makefile != null) {
+			command.append(" --makefile=");
+			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
+			// TODO Make sure the drive letter is lower case.
+			String tmpPath = makefile.getAbsolutePath().replace('\\', '/');
+			if (tmpPath.indexOf(" ") >= 0) {
+				tmpPath = '"' + tmpPath + '"';
+			}
+
+			command.append(tmpPath);
+		}
+
+		if (ignore_errors) {
+			command.append(" -i");
+		}
 
 		// Take care of the optional arguments.
 		if (jobs != null) {
@@ -58,50 +128,7 @@ public class MakeTask extends Task {
 
 		shell.setTaskName(this.getTaskName());
 
-		String cflags = getProject().getProperty("ant.build.native.cflags");
-		if (cflags != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("CFLAGS");
-			env.setValue(cflags);
-
-			shell.addEnv(env);
-		}
-
-		String cxxflags = getProject().getProperty("ant.build.native.cxxflags");
-		if (cxxflags != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("CXXFLAGS");
-			env.setValue(cxxflags);
-
-			shell.addEnv(env);
-		}
-
-		String ldflags = getProject().getProperty("ant.build.native.ldflags");
-		if (ldflags != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("LDFLAGS");
-			env.setValue(ldflags);
-
-			shell.addEnv(env);
-		}
-
-		String cc = getProject().getProperty("ant.build.native.compiler");
-		if (cc != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("CC");
-			env.setValue(cc);
-
-			shell.addEnv(env);
-		}
-
-		String ld = getProject().getProperty("ant.build.native.linker");
-		if (ld != null) {
-			Environment.Variable env = new Environment.Variable();
-			env.setKey("LD");
-			env.setValue(ld);
-
-			shell.addEnv(env);
-		}
+		// FIXME Add env stuff
 
 		shell.setDir(dir);
 		shell.setExecutable("sh");
@@ -114,21 +141,16 @@ public class MakeTask extends Task {
 		shell.execute();
     }
 
-	public void setDir(File dir) {
-		this.dir = dir;
-	}
 
-	public void setJobs(String jobs) {
-		if (jobs.equalsIgnoreCase("auto")) {
-			this.jobs = Runtime.getRuntime().availableProcessors();
-		}
-		else {
-			// FIXME else throw exception!
-			this.jobs = Integer.parseInt(jobs);
-		}
-	}
+	public static class Include extends AbstractFeature implements Cloneable {
+		private String path;
 
-	public void setTarget(String target) {
-		this.target = target.replaceAll(",", " ");
+		public void setPath(String path) {
+			this.path = path;
+		}
+
+		public String getPath() {
+			return this.path;
+		}
 	}
 }

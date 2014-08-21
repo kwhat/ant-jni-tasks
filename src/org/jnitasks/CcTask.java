@@ -198,7 +198,7 @@ public class CcTask extends Task {
 		parallel.execute();
 	}
 
-	public static class Argument extends AbstractFeature {
+	public static class Argument extends AbstractFeature implements Cloneable {
 		private String value;
 
 		public void setValue(String value) {

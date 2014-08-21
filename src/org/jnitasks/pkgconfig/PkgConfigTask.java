@@ -24,6 +24,7 @@ import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.DirSet;
 import org.apache.tools.ant.types.Environment;
+import org.jnitasks.CcTask;
 
 import java.io.File;
 import java.util.Iterator;
@@ -33,10 +34,27 @@ import java.util.Vector;
 public class PkgConfigTask extends Task {
 	private static final String cmd = "pkg-config";
 
+	private String outputProperty = null;
+
+	private boolean modversion = false;
+	private boolean quiet = false;
+
 	private boolean cflags = false;
 	private boolean libs = false;
-	private String outputProperty = null;
-	private String packages = null;
+	private boolean libsOnlyPath = false;
+	private boolean libsOnlyLib = false;
+
+	// TODO Check MSVC toolchain and set --msvc-syntax and --dont-define-prefix
+
+	protected Vector<PkgConfigTask.Variable> variables = new Vector<PkgConfigTask.Variable>();
+	private boolean uninstalled = false;
+	private String exists = null;
+	private boolean libsStatic = false;
+
+
+
+
+	private String libraries = null;
 	private List<DirSet> dirsets = new Vector<DirSet>();
 
 	public void setLibs(boolean libs) {
@@ -51,16 +69,109 @@ public class PkgConfigTask extends Task {
 		this.outputProperty = outputProperty;
 	}
 
-	public void setPackages(String packages) {
-		this.packages = packages;
+	public void setLibraries(String libraries) {
+		this.libraries = libraries;
 	}
 
 	public void addDirset(DirSet dir) {
 		dirsets.add(dir);
 	}
 
+	public PkgConfigTask.Variable createVariable() {
+		PkgConfigTask.Variable variable = new PkgConfigTask.Variable();
+		variables.add(variable);
+
+		return variable;
+	}
+
 	@Override
 	public void execute() throws BuildException {
+		// Set the command to execute along with any required arguments.
+		StringBuilder command = new StringBuilder(cmd);
+
+		if (this.modversion) {
+			command.append(" --modversion");
+		}
+
+		if (this.quiet) {
+			command.append(" --silence-errors");
+		}
+		else {
+			command.append(" --print-errors");
+		}
+
+		if (this.cflags) {
+			command.append(" --cflags");
+		}
+
+		if (this.libs) {
+			command.append(" --libs");
+		}
+
+		if (this.libsOnlyPath) {
+			command.append(" --libs-only-L");
+		}
+
+		if (this.libsOnlyLib) {
+			command.append(" --libs-only-l");
+		}
+
+		// Variable arguments for variable and defined-variable.
+		Iterator<PkgConfigTask.Variable> varItems = variables.iterator();
+		while (varItems.hasNext()) {
+			PkgConfigTask.Variable var = varItems.next();
+
+			if (var.getValue() == null) {
+				command.append(" --variable=").append(var.getName());
+			}
+			else {
+				command.append(" --variable=").append(var.getName())
+						.append('=').append(var.getValue());
+			}
+		}
+
+		if (this.uninstalled) {
+			command.append(" --uninstalled");
+		}
+
+		if (this.exists != null) {
+			command.append(" --exists ").append(exists);
+		}
+
+		if (this.libsStatic) {
+			command.append(" --static");
+		}
+
+
+		// Print the executed command.
+		Echo echo = (Echo) getProject().createTask("echo");
+		echo.addText(command.toString());
+		echo.setTaskName(this.getTaskName());
+		echo.execute();
+
+		// Create an exec task to run a shell.  Using the current shell to
+		// execute commands is required for Windows support.
+		ExecTask shell = (ExecTask) this.getProject().createTask("exec");
+
+		shell.setTaskName(this.getTaskName());
+
+		// Environment.Variable arguments for nested env items.
+		Iterator<Environment.Variable> envItems = env.iterator();
+		while (envItems.hasNext()) {
+			shell.addEnv(envItems.next());
+		}
+
+		shell.setDir(dir);
+		shell.setExecutable("sh");
+
+		shell.setFailonerror(true);
+
+		shell.createArg().setValue("-c");
+		shell.createArg().setValue(command.toString());
+
+		shell.execute();
+
+
 		// Print the executed command.
 		Echo echo = (Echo) getProject().createTask("echo");
 		echo.setTaskName(this.getTaskName());
@@ -88,8 +199,10 @@ public class PkgConfigTask extends Task {
 			shell.createArg().setValue("--libs");
 		}
 
-		echo.addText(' ' + this.packages);
-		shell.createArg().setLine(this.packages);
+
+
+		echo.addText(' ' + this.libraries);
+		shell.createArg().setLine(this.libraries);
 
 		StringBuilder configPath = new StringBuilder();
 		Iterator<DirSet> iterator = dirsets.iterator();
@@ -128,5 +241,8 @@ public class PkgConfigTask extends Task {
 
 		echo.execute();
 		shell.execute();
+	}
+
+	public static class Variable extends CcTask.Define {
 	}
 }
