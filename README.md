@@ -25,7 +25,7 @@ Simply add the following to your ant project:
 
 ## Available Tasks
 
-[autoreconf](#)
+[autoreconf](doc/AUTORECONFIG.md)
 [configure](#)
 [make](#)
 [pkg-config](#)
