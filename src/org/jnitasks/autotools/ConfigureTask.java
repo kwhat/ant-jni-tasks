@@ -313,7 +313,7 @@ public class ConfigureTask extends Task {
 		if (this.libexec != null) {
 			command.append(" --libexecdir=");
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
-			// TODO Make sure the drive letter is lower case.
+			// TOD<envO Make sure the drive letter is lower case.
 			String tmpPath = libexec.getAbsolutePath().replace('\\', '/');
 			if (tmpPath.indexOf(" ") >= 0) {
 				tmpPath = '"' + tmpPath + '"';
