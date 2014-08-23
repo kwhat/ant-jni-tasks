@@ -34,16 +34,13 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class CcTask extends Task {
-	protected Vector<FileSet> filesets = new Vector<FileSet>();
-	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 	private int jobs = Runtime.getRuntime().availableProcessors();
 	private File objdir = null;
 	private String toolchain = "gcc";
 	private String host = "";
 
-	public void addFileset(FileSet fileset) {
-		filesets.add(fileset);
-	}
+	private Vector<FileSet> filesets = new Vector<FileSet>();
+	private Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 
 	public CcTask.Argument createArg() {
 		CcTask.Argument arg = new CcTask.Argument();
@@ -64,6 +61,10 @@ public class CcTask extends Task {
 		features.add(inc);
 
 		return inc;
+	}
+
+	public void addFileset(FileSet fileset) {
+		filesets.add(fileset);
 	}
 
 	public void setToolchain(String toolchain) {
@@ -211,7 +212,7 @@ public class CcTask extends Task {
 	}
 
 	public static class Include extends AbstractFeature implements Cloneable {
-		private String path;
+		private String path = ".";
 
 		public void setPath(String path) {
 			this.path = path;

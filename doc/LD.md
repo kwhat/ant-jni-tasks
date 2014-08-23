@@ -5,15 +5,19 @@
 Use this task to call the native linker directly.
 
 ### Parameters
-| Attribute     | Type    | Default    | Description
-|---------------|---------|------------|------------------------
-| dir           | String  | ${basedir} | Folder to execute the task in
-| jobs			| String  | auto       | Number of parallel jobs or auto for host cpu count
-| toolchain     | String  | gcc        | The toolchain to use when compiling
-| host          | String  | ""         | Host string used to prefix the compiler command
+| Attribute      | Type     | Default                | Description
+|----------------|----------|------------------------|-----------------------------------------------------------------
+| outfile        | File     |                        | Folder to execute the task in
+| toolchain      | String   | gcc                    | The toolchain to use when compiling
+| host           | String   | ""                     | Host string used to prefix the compiler command
 
 ### Nested Elements
 
+[LDTask.LIBRARY](LD.md)
+| Attribute      | Type     | Default                | Description
+|----------------|----------|------------------------|-----------------------------------------------------------------
+| lib            | String   |                        | Name of the library to link against
+| path           | String   |                        | Path to look for the lib in
 
 ### Example
 
@@ -29,6 +33,6 @@ Use this task to call the native linker directly.
 	</fileset>
 
 	<!-- Linking order matters and libraries should come after obj files. -->
-	<arg value="-lm" />
+	<library lib="-lm" />
 </ld>
 ```

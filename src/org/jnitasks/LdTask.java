@@ -31,11 +31,18 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class LdTask extends MatchingTask {
-	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
 	private File outFile = null;
 	private String toolchain = "gcc";
 	private String host = "";
 
+	private Vector<AbstractFeature> features = new Vector<AbstractFeature>();
+
+	public void setOutfile(File outFile) {
+		this.outFile = outFile;
+	}
+	public void setToolchain(String toolchain) {
+		this.toolchain = toolchain;
+	}
 	public void setHost(String host) {
 		if (host == null) {
 			this.host = "";
@@ -44,10 +51,10 @@ public class LdTask extends MatchingTask {
 			this.host = host;
 		}
 	}
-
 	public String getHost() {
 		return this.host;
 	}
+
 
 	public void addFileset(FileSet fileset) {
 		// Wrap FileSet to allow for argument order.
@@ -56,19 +63,9 @@ public class LdTask extends MatchingTask {
 
 		features.add(arg);
 	}
-
 	public void addLibrary(Library library) {
 		features.add(library);
 	}
-
-	public void setToolchain(String toolchain) {
-		this.toolchain = toolchain;
-	}
-
-	public void setOutfile(File outFile) {
-		this.outFile = outFile;
-	}
-
 	public LdTask.Argument createArg() {
 		LdTask.Argument arg = new LdTask.Argument();
 		features.add(arg);

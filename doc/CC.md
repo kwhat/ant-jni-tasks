@@ -2,19 +2,39 @@
 ===========================================================================
 
 ## CC Task
+
 Use this task to call the native compiler directly.
 
+
 ### Parameters
-| Attribute     | Type    | Default    | Description
-|---------------|---------|------------|------------------------
-| dir           | String  | ${basedir} | Folder to execute the task in
-| jobs			| String  | auto       | Number of parallel jobs or auto for host cpu count
-| toolchain     | String  | gcc        | The toolchain to use when compiling
-| host          | String  | ""         | Host string used to prefix the compiler command
+
+| Attribute      | Type     | Default                | Description
+|----------------|----------|------------------------|-----------------------------------------------------------------
+| jobs           | String   | auto                   | Number of parallel jobs or auto for host cpu count
+| objdir         | Dir      |                        | Output directory for object files
+| toolchain      | String   | gcc                    | The toolchain to use when compiling
+| host           | String   | ""                     | Host string used to prefix the compiler command
+
 
 ### Nested Elements
-[CcTask.Include](CCTASK.md)
 
+[CcTask.Arg](CCTASK.md)
+| Attribute      | Type     | Default                | Description
+|----------------|----------|------------------------|-----------------------------------------------------------------
+| value          | String   | ""                     | Argument to pass to the native compiler
+
+[CcTask.Define](CCTASK.md)
+| Attribute      | Type     | Default                | Description
+|----------------|----------|------------------------|-----------------------------------------------------------------
+| name           | String   |                        | Name of defined variable
+| value          | String   |                        | Value of defined variable
+
+[CcTask.Include](CCTASK.md)
+| Attribute      | Type     | Default                | Description
+|----------------|----------|------------------------|-----------------------------------------------------------------
+| path           | String   | "."                    | Argument to pass to the native compiler
+
+[FileSet](https://ant.apache.org/manual/Types/fileset.html)
 
 ### Example
 

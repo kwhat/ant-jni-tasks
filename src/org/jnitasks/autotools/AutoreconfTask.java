@@ -63,7 +63,7 @@ public class AutoreconfTask extends Task {
 	@Override
 	public void execute() throws BuildException {
 		// Set the command to execute along with any required arguments.
-		StringBuilder command = new StringBuilder(cmd);
+		StringBuilder command = new StringBuilder(AutoreconfTask.cmd);
 
 		// Take care of the optional arguments.
 		if (!this.quiet) {

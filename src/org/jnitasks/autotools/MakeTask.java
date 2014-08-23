@@ -20,16 +20,19 @@ package org.jnitasks.autotools;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
+import org.apache.tools.ant.types.Environment;
 import org.jnitasks.types.AbstractFeature;
 
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 public class MakeTask extends Task {
-	private File dir = null;
+	private static final String cmd = "make";
 
 	private boolean force = false;
-
+	private File dir = null;
 	private String debug = null;
 	private boolean override = false;
 	private File makefile = null;
@@ -37,15 +40,32 @@ public class MakeTask extends Task {
 	private Integer jobs = null;
 	private boolean keepGoing = false;
 	private Float load = null;
-
-	protected Vector<MakeTask.Include> features = new Vector<MakeTask.Include>();
-
+	private boolean quiet = false;
+	private boolean touch = false;
+	private boolean printDirectory = false;
 	private String target = null;
 
+	private Vector<MakeTask.Include> features = new Vector<MakeTask.Include>();
+	private List<Environment.Variable> env = new Vector<Environment.Variable>();
+
+	public void setForce(boolean force) {
+		this.force = force;
+	}
 	public void setDir(File dir) {
 		this.dir = dir;
 	}
-
+	public void setDebug(String debug) {
+		this.debug = debug;
+	}
+	public void setOverride(boolean override) {
+		this.override = override;
+	}
+	public void setMakefile(File makefile) {
+		this.makefile = makefile;
+	}
+	public void setIgnoreerrors(boolean ignoreErrors) {
+		this.ignoreErrors = ignoreErrors;
+	}
 	public void setJobs(String jobs) {
 		if (jobs.equalsIgnoreCase("auto")) {
 			this.jobs = Runtime.getRuntime().availableProcessors();
@@ -55,19 +75,39 @@ public class MakeTask extends Task {
 			this.jobs = Integer.parseInt(jobs);
 		}
 	}
-
+	public void setKeepgoing(boolean keepGoing) {
+		this.keepGoing = keepGoing;
+	}
+	public void setLoad(float jobs) {
+		this.load = new Float(jobs);
+	}
+	public void setQuiet(boolean quiet) {
+		this.quiet = quiet;
+	}
+	public void setTouch(boolean touch) {
+		this.touch = touch;
+	}
+	public void setPrintdirectory(boolean printDirectory) {
+		this.printDirectory = printDirectory;
+	}
 	public void setTarget(String target) {
 		this.target = target.replaceAll(",", " ");
 	}
 
-
+	public void addEnv(Environment.Variable var) {
+		this.env.add(var);
+	}
 
 	@Override
     public void execute() {
 		// Set the command to execute along with any required arguments.
 		StringBuilder command = new StringBuilder();
 
-		command.append("make");
+		command.append(MakeTask.cmd);
+
+		if (force) {
+			command.append(" -B");
+		}
 
 		if (debug != null) {
 			if (debug.trim().length() > 0) {
@@ -78,12 +118,8 @@ public class MakeTask extends Task {
 			}
 		}
 
-		if (overrides) {
+		if (override) {
 			command.append(" -e");
-		}
-
-		if (recon) {
-			command.append(" -n");
 		}
 
 		if (quiet) {
@@ -91,7 +127,7 @@ public class MakeTask extends Task {
 		}
 
 		if (makefile != null) {
-			command.append(" --makefile=");
+			command.append(" -f ");
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = makefile.getAbsolutePath().replace('\\', '/');
@@ -102,13 +138,32 @@ public class MakeTask extends Task {
 			command.append(tmpPath);
 		}
 
-		if (ignore_errors) {
+		if (ignoreErrors) {
 			command.append(" -i");
 		}
 
-		// Take care of the optional arguments.
 		if (jobs != null) {
 			command.append(" -j ").append(jobs);
+		}
+
+		if (keepGoing) {
+			command.append(" -k");
+		}
+
+		if (load != null) {
+			command.append(" -l ").append(load);
+		}
+
+		if (quiet) {
+			command.append(" -s");
+		}
+
+		if (touch) {
+			command.append(" -t");
+		}
+
+		if (printDirectory) {
+			command.append(" -w");
 		}
 
 		if (target != null) {
@@ -128,7 +183,11 @@ public class MakeTask extends Task {
 
 		shell.setTaskName(this.getTaskName());
 
-		// FIXME Add env stuff
+		// Environment.Variable arguments for nested env items.
+		Iterator<Environment.Variable> envItems = env.iterator();
+		while (envItems.hasNext()) {
+			shell.addEnv(envItems.next());
+		}
 
 		shell.setDir(dir);
 		shell.setExecutable("sh");

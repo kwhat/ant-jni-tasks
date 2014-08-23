@@ -30,7 +30,7 @@ import java.util.Vector;
 
 public class ConfigureTask extends Task {
 	private File dir = null;
-	private File path = null;
+	private File script = new File("configure");
 
 	// Configuration
 	private boolean quiet = false;
@@ -79,8 +79,8 @@ public class ConfigureTask extends Task {
 	public void setDir(File dir) {
 		this.dir = dir;
 	}
-	public void setPath(File path) {
-		this.path = path;
+	public void setScript(File script) {
+		this.script = script;
 	}
 
 	public void setQuiet(boolean quiet) {
@@ -221,21 +221,12 @@ public class ConfigureTask extends Task {
 
 		// FIXME Replace the path and configure command with a variable
 		// similar to <ant antfile="" />
-		if (path != null) {
-			command.append(path.getAbsolutePath().replace('\\', '/'));
+		command.append(script.getAbsolutePath().replace('\\', '/'));
 
-			// Make sure it ends in a path separator.
-			if (command.charAt(command.length() - 1) != '/') {
-				command.append('/');
-			}
-
-			// Quote the string if it contains a space.
-			if (command.indexOf(" ") >= 0) {
-				command.insert(0, '"').append('"');
-			}
+		// Quote the string if it contains a space.
+		if (command.indexOf(" ") >= 0) {
+			command.insert(0, '"').append('"');
 		}
-
-		command.append("configure");
 
 		if (this.quiet) {
 			command.append(" --quiet");
