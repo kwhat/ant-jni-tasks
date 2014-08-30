@@ -19,17 +19,20 @@ Use this task to call the native compiler directly.
 ### Nested Elements
 
 [CcTask.Arg](CCTASK.md)
+
 | Attribute      | Type     | Default                | Description
 |----------------|----------|------------------------|-----------------------------------------------------------------
 | value          | String   | ""                     | Argument to pass to the native compiler
 
 [CcTask.Define](CCTASK.md)
+
 | Attribute      | Type     | Default                | Description
 |----------------|----------|------------------------|-----------------------------------------------------------------
 | name           | String   |                        | Name of defined variable
 | value          | String   |                        | Value of defined variable
 
 [CcTask.Include](CCTASK.md)
+
 | Attribute      | Type     | Default                | Description
 |----------------|----------|------------------------|-----------------------------------------------------------------
 | path           | String   | "."                    | Argument to pass to the native compiler
