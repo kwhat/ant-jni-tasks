@@ -36,6 +36,7 @@
 	<property name="dir.src"	value="${basedir}/src" />
 	<property name="dir.test"	value="${basedir}/test" />
 	<property name="dir.doc"	value="${basedir}/doc" />
+	<property name="dir.jdoc"	value="${basedir}/javadoc" />
 	<property name="dir.jar"	value="${basedir}/jar" />
 	<property name="dir.dist"	value="${basedir}/dist" />
 	<property name="dir.bin"	value="${basedir}/bin" />
@@ -144,9 +145,9 @@
 
 	<target name="javadoc" description="Generates javadoc api documentation.">
 		<echo level="info">Generating API Documentation...</echo>
-		<mkdir dir="${dir.doc}" />
+		<mkdir dir="${dir.jdoc}" />
 
-		<javadoc destdir="${dir.doc}" windowtitle="${ant.project.name}" author="true" version="true" use="true">
+		<javadoc destdir="${dir.jdoc}" windowtitle="${ant.project.name}" author="true" version="true" use="true">
 			<packageset dir="${dir.src}" defaultexcludes="yes">
 				<include name="org/jnitasks/**" />
 				<exclude name="org/jnitasks/test/**" />
@@ -170,34 +171,30 @@
 		<echo>Creating Distribution Archive...</echo>
 		<mkdir dir="${dir.dist}" />
 
-		<zip destfile="${dir.dist}/${ant.project.name}-${ant.project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
-				<include name="*.jar" />
-			</zipfileset>
-
-			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
-				<include name="COPYING*.md" />
-				<include name="README.md" />
-			</zipfileset>
-		</zip>
-
-		<zip destfile="${dir.dist}/${ant.project.name}-doc-${ant.project.version}.zip" duplicate="add" level="9">
+		<zip destfile="${dir.dist}/${ant.project.name}-${ant.project.version}.zip" level="9">
 			<zipfileset dir="${dir.doc}" prefix="${ant.project.name}/doc">
 				<exclude name="**/.*" />
 			</zipfileset>
-		</zip>
 
-		<zip destfile="${dir.dist}/${ant.project.name}-src-${ant.project.version}.zip" duplicate="add" level="9">
-			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
+			<zipfileset dir="${dir.jdoc}" prefix="${ant.project.name}/javadoc">
 				<exclude name="**/.*" />
+			</zipfileset>
 
-				<include name="*.md" />
-				<include name="build.*" />
-				<exclude name="build.properties*" />
+			<zipfileset dir="${dir.jar}" prefix="${ant.project.name}/jar">
+				<include name="${ant.project.name}.jar" />
 			</zipfileset>
 
 			<zipfileset dir="${dir.src}" prefix="${ant.project.name}/src">
 				<exclude name="**/.*" />
+			</zipfileset>
+
+			<zipfileset dir="${dir.test}" prefix="${ant.project.name}/test">
+				<exclude name="**/.*" />
+			</zipfileset>
+
+			<zipfileset dir="${basedir}" prefix="${ant.project.name}">
+				<include name="build.*" />
+				<include name="*.md" />
 			</zipfileset>
 		</zip>
 	</target>
