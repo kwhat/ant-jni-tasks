@@ -5,6 +5,7 @@
 Use this task to call the native linker directly.
 
 ### Parameters
+
 | Attribute      | Type     | Default                | Description
 |----------------|----------|------------------------|-----------------------------------------------------------------
 | outfile        | File     |                        | Folder to execute the task in
@@ -14,6 +15,7 @@ Use this task to call the native linker directly.
 ### Nested Elements
 
 [LDTask.LIBRARY](LD.md)
+
 | Attribute      | Type     | Default                | Description
 |----------------|----------|------------------------|-----------------------------------------------------------------
 | lib            | String   |                        | Name of the library to link against
