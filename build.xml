@@ -27,7 +27,7 @@
 	</tstamp>
 
 	<property name="ant.project.vendor" value="Alexander Barker (alex@1stleg.com)" />
-    <property name="ant.project.version" value="${ant.build.major}.${ant.build.minor}.${ant.build.revision}" />
+	<property name="ant.project.version" value="${ant.build.major}.${ant.build.minor}.${ant.build.revision}" />
 
 	<property file="build.properties" />
 	<property environment="env" />
