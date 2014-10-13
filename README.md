@@ -1,5 +1,5 @@
-[JNITasks](https://github.com/kwhat/jnitasks/) - Ant Tasks for JNI Projects
-===========================================================================
+[JNITasks](https://github.com/kwhat/jnitasks/) - Ant Tasks for Building JNI Projects
+====================================================================================
 
 ## About
 JNITasks are a set of simple Ant tasks to reliably build Java Native Interface (JNI) projects and their dependencies.
