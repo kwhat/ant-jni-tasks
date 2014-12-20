@@ -19,7 +19,6 @@ package org.jnitasks.toolchains;
 
 import org.apache.tools.ant.ProjectComponent;
 import org.jnitasks.types.AbstractFeature;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;

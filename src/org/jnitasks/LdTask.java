@@ -25,7 +25,6 @@ import org.apache.tools.ant.types.FileSet;
 import org.jnitasks.toolchains.LinkerAdapter;
 import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
@@ -74,24 +73,28 @@ public class LdTask extends MatchingTask {
 	}
 
 	public void execute() {
+		// Make sure we have all the required fields set.
 		if (outFile == null) {
 			throw new BuildException("The outFile attribute is required");
 		}
+
+
+		// First, populate all of the properties we care about for this task.
+		if (getProject().getProperty("ant.build.native.toolchain") != null) {
+			this.setToolchain(getProject().getProperty("ant.build.native.toolchain"));
+		}
+
+		if (getProject().getProperty("ant.build.native.host") != null) {
+			this.setHost(getProject().getProperty("ant.build.native.host"));
+		}
+
 
 		// Setup the compiler.
 		LinkerAdapter linker = ToolchainFactory.getLinker(toolchain);
 		linker.setProject(getProject());
 		linker.setOutFile(outFile);
 
-		setHost(getProject().getProperty("ant.build.native.host"));
-
-		if (getProject().getProperty("ant.build.native.linker") != null) {
-			linker.setExecutable(getProject().getProperty("ant.build.native.compiler"));
-		}
-		else if (System.getenv().get("LD") != null) {
-			linker.setExecutable(System.getenv().get("LD"));
-		}
-		else if (host.length() > 0) {
+		if (host != null && host.length() > 0) {
 			// Prepend the host string to the executable.
 			linker.setExecutable(host + '-' + linker.getExecutable());
 		}

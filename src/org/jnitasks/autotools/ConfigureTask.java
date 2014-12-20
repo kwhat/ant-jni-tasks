@@ -21,8 +21,9 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Environment;
+import org.jnitasks.toolchains.CompilerAdapter;
+import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
@@ -69,6 +70,7 @@ public class ConfigureTask extends Task {
 	private String programTransformName = null;
 
 	// System types
+	private String toolchain = null;
 	private String build = null;
 	private String host = null;
 	private String target = null;
@@ -171,6 +173,9 @@ public class ConfigureTask extends Task {
 		this.programTransformName = programTransformName;
 	}
 
+	public void setToolchain(String toolchain) {
+		this.toolchain = toolchain;
+	}
 	public void setBuild(String build) {
 		this.build = build;
 	}
@@ -180,6 +185,7 @@ public class ConfigureTask extends Task {
 	public void setTarget(String target) {
 		this.target = target;
 	}
+
 
 	// Optional Features
 	public Enable createEnable() {
@@ -216,6 +222,24 @@ public class ConfigureTask extends Task {
 
 	@Override
     public void execute() {
+		// First, populate all of the properties we care about for this task.
+		if (getProject().getProperty("ant.build.native.toolchain") != null) {
+			this.setToolchain(getProject().getProperty("ant.build.native.toolchain"));
+		}
+
+		if (getProject().getProperty("ant.build.native.build") != null) {
+			this.setBuild(getProject().getProperty("ant.build.native.build"));
+		}
+
+		if (getProject().getProperty("ant.build.native.host") != null) {
+			this.setHost(getProject().getProperty("ant.build.native.host"));
+		}
+
+		if (getProject().getProperty("ant.build.native.target") != null) {
+			this.setTarget(getProject().getProperty("ant.build.native.target"));
+		}
+
+
 		// Set the command to execute along with any required arguments.
 		StringBuilder command = new StringBuilder();
 
@@ -515,28 +539,35 @@ public class ConfigureTask extends Task {
 			command.append(" --program-transform-name=").append(this.programTransformName);
 		}
 
+		if (this.toolchain != null) {
+			CompilerAdapter compiler = ToolchainFactory.getCompiler(this.toolchain);
+			if (host != null && host.length() > 0) {
+				// Prepend the host string to the executable.
+				compiler.setExecutable(host + '-' + compiler.getExecutable());
+			}
+
+			Environment.Variable cc = new Environment.Variable();
+			cc.setKey("CC");
+			cc.setValue(compiler.getExecutable());
+			env.add(cc);
+
+			Environment.Variable cxx = new Environment.Variable();
+			cxx.setKey("CXX");
+			cxx.setValue(compiler.getExecutable());
+			env.add(cxx);
+		}
 
 		if (this.build != null) {
 			command.append(" --build=").append(this.build);
-		}
-		else if (getProject().getProperty("ant.build.native.build") != null) {
-			command.append(" --build=").append(getProject().getProperty("ant.build.native.build"));
 		}
 
 		if (this.host != null) {
 			command.append(" --host=").append(this.host);
 		}
-		else if (getProject().getProperty("ant.build.native.host") != null) {
-			command.append(" --host=").append(getProject().getProperty("ant.build.native.host"));
-		}
 
 		if (this.target != null) {
 			command.append(" --target=").append(this.target);
 		}
-		else if (getProject().getProperty("ant.build.native.target") != null) {
-			command.append(" --target=").append(getProject().getProperty("ant.build.native.target"));
-		}
-
 
 		// AbstractFeature arguments for nested enable/disable & with/without.
 		Iterator<AbstractFeature> iterator = flags.iterator();

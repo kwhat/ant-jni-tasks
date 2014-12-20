@@ -25,7 +25,6 @@ import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.DirSet;
 import org.apache.tools.ant.types.Environment;
 import org.jnitasks.CcTask;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;

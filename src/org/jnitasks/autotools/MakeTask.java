@@ -17,12 +17,12 @@
  */
 package org.jnitasks.autotools;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Environment;
 import org.jnitasks.types.AbstractFeature;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
@@ -71,8 +71,12 @@ public class MakeTask extends Task {
 			this.jobs = Runtime.getRuntime().availableProcessors();
 		}
 		else {
-			// FIXME else throw exception!
-			this.jobs = Integer.parseInt(jobs);
+			try {
+				this.jobs = Integer.parseInt(jobs);
+			}
+			catch (NumberFormatException e) {
+				throw new BuildException("Invalid property value for jobs.");
+			}
 		}
 	}
 	public void setKeepgoing(boolean keepGoing) {

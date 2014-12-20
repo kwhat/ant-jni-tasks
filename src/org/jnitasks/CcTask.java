@@ -28,7 +28,6 @@ import org.apache.tools.ant.types.FileSet;
 import org.jnitasks.toolchains.CompilerAdapter;
 import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
@@ -71,10 +70,6 @@ public class CcTask extends Task {
 		this.toolchain = toolchain;
 	}
 
-	public String getToolchain() {
-		return this.toolchain;
-	}
-
 	public void setHost(String host) {
 		if (host == null) {
 			this.host = "";
@@ -82,10 +77,6 @@ public class CcTask extends Task {
 		else {
 			this.host = host;
 		}
-	}
-
-	public String getHost() {
-		return this.host;
 	}
 
 	public void setObjdir(File objdir) {
@@ -107,19 +98,20 @@ public class CcTask extends Task {
 	}
 
 	public void execute() {
+		// First, populate all of the properties we care about for this task.
+		if (getProject().getProperty("ant.build.native.toolchain") != null) {
+			this.setToolchain(getProject().getProperty("ant.build.native.toolchain"));
+		}
+
+		if (getProject().getProperty("ant.build.native.host") != null) {
+			this.setHost(getProject().getProperty("ant.build.native.host"));
+		}
+
 		// Setup the compiler.
 		CompilerAdapter compiler = ToolchainFactory.getCompiler(toolchain);
 		compiler.setProject(getProject());
 
-		setHost(getProject().getProperty("ant.build.native.host"));
-
-		if (getProject().getProperty("ant.build.native.compiler") != null) {
-			compiler.setExecutable(getProject().getProperty("ant.build.native.compiler"));
-		}
-		else if (System.getenv().get("CC") != null) {
-			compiler.setExecutable(System.getenv().get("CC"));
-		}
-		else if (host.length() > 0) {
+		if (host != null && host.length() > 0) {
 			// Prepend the host string to the executable.
 			compiler.setExecutable(host + '-' + compiler.getExecutable());
 		}

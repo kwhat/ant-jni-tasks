@@ -20,7 +20,6 @@ package org.jnitasks.toolchains.adapters;
 import org.jnitasks.CcTask;
 import org.jnitasks.toolchains.CompilerAdapter;
 import org.jnitasks.types.AbstractFeature;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

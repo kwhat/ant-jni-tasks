@@ -21,14 +21,12 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.ProjectComponent;
 import org.jnitasks.LdTask;
 import org.jnitasks.types.AbstractFeature;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
 public abstract class LinkerAdapter extends ProjectComponent {
-	private String command = null;
 	private String executable = "cc";
 
 	protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();

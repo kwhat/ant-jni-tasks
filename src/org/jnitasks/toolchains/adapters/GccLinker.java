@@ -21,7 +21,6 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.jnitasks.LdTask;
 import org.jnitasks.toolchains.LinkerAdapter;
 import org.jnitasks.types.AbstractFeature;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -22,7 +22,6 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.jnitasks.CcTask;
-
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
