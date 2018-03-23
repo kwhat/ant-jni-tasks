@@ -1,5 +1,5 @@
 /* JNITasks: Ant tasks for JNI projects.
- * Copyright (C) 2013-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2013-2018 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnitasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
@@ -261,7 +261,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = cache.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -277,7 +277,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = cache.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -290,7 +290,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = prefix.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -302,7 +302,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = exec_prefix.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -315,7 +315,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = bin.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -327,7 +327,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = sbin.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -339,7 +339,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TOD<envO Make sure the drive letter is lower case.
 			String tmpPath = libexec.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -351,7 +351,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = sysconf.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -363,7 +363,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = sharedstate.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -375,7 +375,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = localstate.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -387,7 +387,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = lib.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -399,7 +399,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = include.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -411,7 +411,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = oldinclude.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -423,7 +423,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = dataroot.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -435,7 +435,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = info.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -447,7 +447,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = locale.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -459,7 +459,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = man.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -471,7 +471,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = doc.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -483,7 +483,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = html.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -495,7 +495,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = dvi.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -507,7 +507,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = pdf.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -519,7 +519,7 @@ public class ConfigureTask extends Task {
 			// TODO Change to getCanonicalPath() when ready to deal with the io exception.
 			// TODO Make sure the drive letter is lower case.
 			String tmpPath = ps.getAbsolutePath().replace('\\', '/');
-			if (tmpPath.indexOf(" ") >= 0) {
+			if (tmpPath.contains(" ")) {
 				tmpPath = '"' + tmpPath + '"';
 			}
 
@@ -622,7 +622,7 @@ public class ConfigureTask extends Task {
 		shell.execute();
     }
 
-	private static class ToggleFeature extends AbstractFeature {
+	protected static class ToggleFeature extends AbstractFeature {
 		private String flag;
 
 		public void addText(String flag) {

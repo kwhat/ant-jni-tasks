@@ -1,5 +1,5 @@
 /* JNITasks: Ant tasks for JNI projects.
- * Copyright (C) 2013-2014 Alexander Barker.  All Rights Received.
+ * Copyright (C) 2013-2018 Alexander Barker.  All Rights Received.
  * https://github.com/kwhat/jnitasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
