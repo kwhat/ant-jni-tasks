@@ -1,8 +1,8 @@
-[JNITasks](https://github.com/kwhat/jnitasks/) - Ant Tasks for Building JNI Projects
+[Ant-JNITasks](https://github.com/kwhat/ant-jnitasks/) - Ant Tasks for Compiling Native Code in JNI Projects
 ====================================================================================
 
 ## About
-JNITasks are a set of simple Ant tasks to reliably build Java Native Interface (JNI) projects and their dependencies.
+JNITasks are a set of simple Ant tasks to reliably build C/C++ code for Java Native Interface (JNI) projects as well as any native library dependencies.
 
 ### Supported Toolchains
 * GNU C Compiler
