@@ -1,4 +1,4 @@
-[ant-jnitasks](https://github.com/kwhat/ant-jnitasks/) - Ant Tasks for Compiling Native Code in JNI Projects
+[ant-jnitasks](https://github.com/kwhat/ant-jnitasks/) - Ant Tasks for Compiling Native C/C++ Code for JNI Projects
 ====================================================================================
 
 ## About
