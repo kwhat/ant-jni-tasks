@@ -1,8 +1,14 @@
-[ant-jnitasks](https://github.com/kwhat/ant-jnitasks/) - Ant Tasks for Compiling Native C/C++ Code for JNI Projects
+[ant-jni-tasks](https://github.com/kwhat/ant-jni-tasks/) - Ant Tasks for Compiling Native C/C++ Code for JNI Projects
 ====================================================================================
 
 ## About
-JNITasks are a set of simple Ant tasks to reliably build C/C++ code for Java Native Interface (JNI) projects as well as any native library dependencies that maybe required.  The goal of the project is to provide a spmlified, working alternative to the legacy ant-contrib [cpptasks](http://ant-contrib.sourceforge.net/cpptasks/index.html) allowing C/C++ code to be configured and built directly from Ant as part of the Java build process.  No external shell, bat or ps1 shell scripts to bootstrap the process and no repetitive exec commands all over your build.xml file.
+Simple Ant tasks to reliably build C/C++ code for Java Native Interface (JNI) projects as well as 
+any native library dependencies that maybe required.  The goal of the project is to provide a 
+simplified, working alternative to the legacy ant-contrib 
+[cpptasks](http://ant-contrib.sourceforge.net/cpptasks/index.html) allowing C/C++ code to be 
+configured and built directly from Ant as part of the Java build process.  No external shell, bat 
+or ps1 shell scripts to bootstrap the process and no repetitive exec commands all over your 
+build.xml file.
 
 ### Supported Toolchains
 * GNU C Compiler
@@ -11,6 +17,7 @@ JNITasks are a set of simple Ant tasks to reliably build C/C++ code for Java Nat
 * LLVM CLANG++ Compiler
 
 ### Supported Build Systems
+* CMake
 * GNU Autotools
 * GNU Make
 

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<!--
+JNITasks: Ant tasks for JNI projects.
+Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
+https://github.com/kwhat/jnitasks/
+
+JNITasks is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+JNITasks is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<antlib>
+  <typedef name="autoreconf" classname="org.jnitasks.autotools.AutoreconfTask"/>
+  <typedef name="configure" classname="org.jnitasks.autotools.ConfigureTask"/>
+  <typedef name="make" classname="org.jnitasks.autotools.MakeTask"/>
+
+  <typedef name="build" classname="org.jnitasks.cmake.BuildTask"/>
+  <typedef name="generate" classname="org.jnitasks.cmake.GenerateTask"/>
+
+  <typedef name="pkgconfig" classname="org.jnitasks.pkgconfig.PkgConfigTask"/>
+
+  <typedef name="cc" classname="org.jnitasks.CcTask"/>
+  <typedef name="ld" classname="org.jnitasks.LdTask"/>
+</antlib>
