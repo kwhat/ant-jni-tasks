@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,8 @@ package org.jnitasks;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
@@ -35,8 +37,12 @@ import org.jnitasks.types.AbstractFeature;
 public class CcTask extends Task {
     private int jobs = Runtime.getRuntime().availableProcessors();
     private File objdir = null;
+
+    @Setter
     private String toolchain = "gcc";
-    private String host = "";
+
+    @Setter
+    private String host;
 
     private Vector<FileSet> filesets = new Vector<FileSet>();
     private Vector<AbstractFeature> features = new Vector<AbstractFeature>();
@@ -66,17 +72,6 @@ public class CcTask extends Task {
         filesets.add(fileset);
     }
 
-    public void setToolchain(String toolchain) {
-        this.toolchain = toolchain;
-    }
-
-    public void setHost(String host) {
-        if (host == null) {
-            this.host = "";
-        } else {
-            this.host = host;
-        }
-    }
 
     public void setObjdir(File objdir) {
         if (!objdir.exists() || !objdir.isDirectory()) {
@@ -185,50 +180,24 @@ public class CcTask extends Task {
     }
 
     public static class Argument extends AbstractFeature implements Cloneable {
-
+        @Getter
+        @Setter
         private String value;
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
     }
 
     public static class Include extends AbstractFeature implements Cloneable {
-
+        @Getter
+        @Setter
         private String path = ".";
-
-        public void setPath(String path) {
-            this.path = path;
-        }
-
-        public String getPath() {
-            return this.path;
-        }
     }
 
     public static class Define extends AbstractFeature implements Cloneable {
-
+        @Getter
+        @Setter
         private String name;
+
+        @Getter
+        @Setter
         private String value;
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return this.value;
-        }
     }
 }

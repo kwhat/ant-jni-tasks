@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -36,7 +36,11 @@ public abstract class AbstractFeature extends DataType {
      *                 which case no "if" test is performed.
      */
     public void setIf(String property) {
-        ifCondition = (property == null) ? "" : property;
+        if (property == null) {
+            ifCondition = "";
+        } else {
+            ifCondition = property;
+        }
     }
 
     /**
@@ -47,7 +51,12 @@ public abstract class AbstractFeature extends DataType {
      * @since 1.6.2
      */
     public String getIf() {
-        return ("".equals(ifCondition) ? null : ifCondition);
+        String condition = ifCondition;
+        if ("".equals(condition)) {
+            condition = null;
+        }
+
+        return condition;
     }
 
     /**
@@ -61,7 +70,11 @@ public abstract class AbstractFeature extends DataType {
      *                 which case no "unless" test is performed.
      */
     public void setUnless(String property) {
-        unlessCondition = (property == null) ? "" : property;
+        if (property == null) {
+            unlessCondition = "";
+        } else {
+            unlessCondition = property;
+        }
     }
 
     /**
@@ -72,7 +85,12 @@ public abstract class AbstractFeature extends DataType {
      * @since 1.6.2
      */
     public String getUnless() {
-        return ("".equals(unlessCondition) ? null : unlessCondition);
+        String condition = unlessCondition;
+        if ("".equals(condition)) {
+            condition = null;
+        }
+
+        return condition;
     }
 
     /**
@@ -84,12 +102,13 @@ public abstract class AbstractFeature extends DataType {
      * @see #setIf(String)
      */
     public boolean isIfConditionValid() {
-        if ("".equals(ifCondition)) {
-            return true;
+        boolean isCondition = "".equals(ifCondition);
+        if (!isCondition) {
+            String test = getProject().replaceProperties(ifCondition);
+            isCondition = getProject().getProperty(test) == null;
         }
 
-        String test = getProject().replaceProperties(ifCondition);
-        return getProject().getProperty(test) != null;
+        return isCondition;
     }
 
     /**
@@ -101,10 +120,12 @@ public abstract class AbstractFeature extends DataType {
      * @see #setUnless(String)
      */
     public boolean isUnlessConditionValid() {
-        if ("".equals(unlessCondition)) {
-            return true;
+        boolean isCondition = "".equals(unlessCondition);
+        if (!isCondition) {
+            String test = getProject().replaceProperties(unlessCondition);
+            isCondition = getProject().getProperty(test) == null;
         }
-        String test = getProject().replaceProperties(unlessCondition);
-        return getProject().getProperty(test) == null;
+
+        return isCondition;
     }
 }

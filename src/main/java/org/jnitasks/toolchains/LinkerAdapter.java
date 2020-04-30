@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,29 +20,28 @@ package org.jnitasks.toolchains;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.ProjectComponent;
 import org.jnitasks.LdTask;
 import org.jnitasks.types.AbstractFeature;
 
 public abstract class LinkerAdapter extends ProjectComponent {
-
+    @Getter
+    @Setter
     private String executable = "cc";
 
-    protected Vector<AbstractFeature> features = new Vector<AbstractFeature>();
+    @Getter
+    @Setter
     private File outFile = new File("a.out");
+
+    protected List<AbstractFeature> features = new Vector<AbstractFeature>();
 
     public void addArg(AbstractFeature arg) {
         this.features.add(arg);
-    }
-
-    public void setOutFile(File file) {
-        this.outFile = file;
-    }
-
-    public File getOutFile() {
-        return this.outFile;
     }
 
     public Iterator<File> getInFiles() {
@@ -55,24 +54,16 @@ public abstract class LinkerAdapter extends ProjectComponent {
 
                     DirectoryScanner scanner = arg.getFileSet().getDirectoryScanner(getProject());
                     String[] files = scanner.getIncludedFiles();
-                    for (int i = 0; i < files.length; i++) {
+                    for (String file : files) {
                         File basePath = scanner.getBasedir();
 
-                        inFiles.add(new File(basePath, files[i]));
+                        inFiles.add(new File(basePath, file));
                     }
                 }
             }
         }
 
         return inFiles.iterator();
-    }
-
-    public void setExecutable(String executable) {
-        this.executable = executable;
-    }
-
-    public String getExecutable() {
-        return executable;
     }
 
     public abstract Iterator<String> getArgs();

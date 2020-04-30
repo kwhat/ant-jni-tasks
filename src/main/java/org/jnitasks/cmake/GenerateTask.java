@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -30,15 +30,15 @@ import org.jnitasks.types.AbstractFeature;
 public class GenerateTask extends Task {
     private static final String cmd = "cmake";
 
-    private File src = null;
     private File dir = null;
+    private File src = null;
     private File cache = null;
 
     private boolean verbose = true;
 
-    private List<AbstractFeature> features = new Vector<>();
-    private List<GenerateTask.Option> options = new Vector<>();
+    private List<GenerateTask.Define> defines = new Vector<>();
 
+    @SuppressWarnings("unused")
     public void setSrc(File src) {
         if (!src.exists() || !src.isDirectory()) {
             throw new BuildException("Invalid source directory.");
@@ -47,6 +47,7 @@ public class GenerateTask extends Task {
         this.src = src;
     }
 
+    @SuppressWarnings("unused")
     public void setDir(File dir) {
         if (!dir.exists() && !dir.mkdir()) {
             throw new BuildException("Failed to create build directory.");
@@ -65,18 +66,11 @@ public class GenerateTask extends Task {
         this.cache = cache;
     }
 
-    public CcTask.Argument createArg() {
-        CcTask.Argument arg = new CcTask.Argument();
-        features.add(arg);
+    public GenerateTask.Define createDefine() {
+        GenerateTask.Define define = new GenerateTask.Define();
+        defines.add(define);
 
-        return arg;
-    }
-
-    public GenerateTask.Option createOption() {
-        Option opt = new Option();
-        options.add(opt);
-
-        return opt;
+        return define;
     }
 
     @Override
@@ -103,17 +97,16 @@ public class GenerateTask extends Task {
         }
 
         // Include arguments for nested Include.
-		/*
-		for (Option include : options) {
-			if (include.isIfConditionValid() && include.isUnlessConditionValid()) {
-				if (include.isPrepend()) {
-					command.append(" -B").append(include.getPath());
-				} else {
-					command.append(" -I").append(include.getPath());
-				}
+		for (GenerateTask.Define define : this.defines) {
+			if (define.isIfConditionValid() && define.isUnlessConditionValid()) {
+				command
+                    .append(" ")
+                    .append(define.getName());
+
+				//if (define.getType())
 			}
 		}
-		*/
+
 
         // Print the executed command.
         Echo echo = (Echo) getProject().createTask("echo");
@@ -142,19 +135,19 @@ public class GenerateTask extends Task {
         shell.execute();
     }
 
-    public static class Argument extends AbstractFeature implements Cloneable {
-        private String value;
 
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
+    public static class Argument extends CcTask.Argument {
     }
 
-    public static class Option extends CcTask.Define {
+    public static class Define extends CcTask.Define {
+        public enum Type {
+            BOOL,
+            FILEPATH,
+            PATH,
+            STRING,
+            INTERNAL
+        }
+        
         private Type type;
 
         public void setType(Type type) {
@@ -164,13 +157,11 @@ public class GenerateTask extends Task {
         public Type getType() {
             return this.type;
         }
+    }
 
-        public enum Type {
-            BOOL,
-            FILEPATH,
-            PATH,
-            STRING,
-            INTERNAL
-        }
+    public static class Undefine extends AbstractFeature implements Cloneable {
+    }
+
+    public static class Warning extends CcTask.Define {
     }
 }

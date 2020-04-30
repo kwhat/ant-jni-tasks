@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
- * Copyright (C) 2013-2018 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -15,30 +15,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jnitasks.test.autotools;
+package org.jnitasks.test;
 
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 
-public class VerboseLogger extends DefaultLogger {
-	private String lastMessage;
-    
-	public VerboseLogger() {
-		super();
-        
-		setMessageOutputLevel(Project.MSG_INFO);
-		setOutputPrintStream(System.out);
-		setErrorPrintStream(System.err);
-	}
-    
-	@Override
-	protected void log(String message) {
-		this.lastMessage = message;
+public class TestLogger extends DefaultLogger {
+    private final StringBuffer messages = new StringBuffer();
 
-		//System.out.println(message);
-	}
-	
-	public String getLastMessgae() {
-		return this.lastMessage;
-	}
+    public TestLogger() {
+        super();
+
+        setMessageOutputLevel(Project.MSG_INFO);
+        setOutputPrintStream(System.out);
+        setErrorPrintStream(System.err);
+    }
+
+    @Override
+    protected void log(String message) {
+        if (messages.length() > 0) {
+            messages.append("\n");
+        }
+        messages.append(message);
+    }
+
+    public String getAllMessages() {
+        return messages.toString();
+    }
 }

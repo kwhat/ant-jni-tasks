@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -38,12 +38,16 @@ public class GccLinker extends LinkerAdapter {
 
         for (AbstractFeature feat : features) {
             if (feat.isIfConditionValid() && feat.isUnlessConditionValid()) {
-                if (feat instanceof LdTask.Library) {
+                if (feat instanceof LdTask.Argument) {
+                    LdTask.Argument arg = (LdTask.Argument) feat;
+
+                    args.add(arg.getValue());
+                } else if (feat instanceof LdTask.Library) {
                     LdTask.Library lib = (LdTask.Library) feat;
 
                     if (lib.getPath() != null) {
+                        // Convert Windows paths to posix compatible paths.
                         String path = lib.getPath().getPath().replace('\\', '/');
-
                         if (path.contains(" ")) {
                             path = '"' + path + '"';
                         }
@@ -54,25 +58,26 @@ public class GccLinker extends LinkerAdapter {
                     if (lib.getLib() != null) {
                         args.add("-l" + lib.getLib());
                     }
-                } else if (feat instanceof LdTask.Argument) {
-                    LdTask.Argument arg = (LdTask.Argument) feat;
-
-                    args.add(arg.getValue());
                 } else if (feat instanceof LdTask.FileSetArgument) {
                     LdTask.FileSetArgument arg = (LdTask.FileSetArgument) feat;
 
                     DirectoryScanner scanner = arg.getFileSet().getDirectoryScanner(getProject());
                     String[] files = scanner.getIncludedFiles();
-                    for (int i = 0; i < files.length; i++) {
-                        File basePath = scanner.getBasedir();
-
+                    for (String file : files) {
                         // Convert Windows paths to posix compatible paths.
-                        args.add(new File(basePath, files[i]).getAbsolutePath().replace('\\', '/'));
+                        String path = new File(scanner.getBasedir(), file).getAbsolutePath()
+                            .replace('\\', '/');
+                        if (path.contains(" ")) {
+                            path = '"' + path + '"';
+                        }
+
+                        args.add(path);
                     }
                 }
             }
         }
 
+        // Convert Windows paths to posix compatible paths.
         String outfile = this.getOutFile().getPath().replace('\\', '/');
         if (outfile.contains(" ")) {
             outfile = '"' + outfile + '"';

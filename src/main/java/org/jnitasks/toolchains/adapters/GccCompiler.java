@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -32,7 +32,7 @@ public class GccCompiler extends CompilerAdapter {
     }
 
     public Iterator<String> getArgs() {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         for (AbstractFeature feat : features) {
             if (feat instanceof CcTask.Define) {
@@ -44,13 +44,12 @@ public class GccCompiler extends CompilerAdapter {
                 }
                 args.add(macro);
             } else if (feat instanceof CcTask.Include) {
-                String inc = ((CcTask.Include) feat).getPath().replace('\\', '/');
-
-                if (inc.contains(" ")) {
-                    inc = '"' + inc + '"';
+                String path = ((CcTask.Include) feat).getPath().replace('\\', '/');
+                if (path.contains(" ")) {
+                    path = '"' + path + '"';
                 }
 
-                args.add("-I" + inc);
+                args.add("-I" + path);
             } else if (feat instanceof CcTask.Argument) {
                 CcTask.Argument arg = (CcTask.Argument) feat;
 

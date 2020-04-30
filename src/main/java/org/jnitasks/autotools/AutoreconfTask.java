@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,8 @@ package org.jnitasks.autotools;
 import java.io.File;
 import java.util.List;
 import java.util.Vector;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
@@ -29,34 +31,34 @@ import org.jnitasks.CcTask;
 public class AutoreconfTask extends Task {
     private static final String cmd = "autoreconf";
 
-    private File dir = null;
+    private File dir;
 
+    @Setter
     private boolean force = false;
+
+    @Setter
     private boolean install = false;
+
+    @Setter
     private boolean quiet = false;
 
-    private final List<AutoreconfTask.Include> includes = new Vector<>();
+    private final List<AutoreconfTask.Include> include = new Vector<>();
 
-
+    @SuppressWarnings("unused")
     public void setDir(File dir) {
+        if (!dir.exists() && !dir.mkdir()) {
+            throw new BuildException("Failed to create build directory.");
+        } else if (!dir.isDirectory()) {
+            throw new BuildException("Invalid build directory.");
+        }
+
         this.dir = dir;
     }
 
-    public void setForce(boolean force) {
-        this.force = force;
-    }
-
-    public void setInstall(boolean install) {
-        this.install = install;
-    }
-
-    public void setQuiet(boolean quiet) {
-        this.quiet = quiet;
-    }
-
+    @SuppressWarnings("unused")
     public AutoreconfTask.Include createInclude() {
         Include inc = new Include();
-        includes.add(inc);
+        include.add(inc);
 
         return inc;
     }
@@ -80,13 +82,21 @@ public class AutoreconfTask extends Task {
         }
 
         // Include arguments for nested Include.
-        for (Include include : includes) {
-            if (include.isIfConditionValid() && include.isUnlessConditionValid()) {
-                if (include.isPrepend()) {
-                    command.append(" -B").append(include.getPath());
+        for (Include inc : this.include) {
+            if (inc.isIfConditionValid() && inc.isUnlessConditionValid()) {
+                command.append(" ");
+                if (inc.isPrepend()) {
+                    command.append("--prepend-include=");
                 } else {
-                    command.append(" -I").append(include.getPath());
+                    command.append("--include=");
                 }
+
+                String path = inc.getPath().replace('\\', '/');
+                if (path.contains(" ")) {
+                    path = '"' + path + '"';
+                }
+
+                command.append(path);
             }
         }
 
@@ -118,14 +128,8 @@ public class AutoreconfTask extends Task {
     }
 
     public static class Include extends CcTask.Include {
+        @Getter
+        @Setter
         private boolean prepend = false;
-
-        public void setPrepend(boolean prepend) {
-            this.prepend = prepend;
-        }
-
-        public boolean isPrepend() {
-            return this.prepend;
-        }
     }
 }

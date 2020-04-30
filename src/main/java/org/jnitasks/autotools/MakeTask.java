@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -20,6 +20,8 @@ package org.jnitasks.autotools;
 import java.io.File;
 import java.util.List;
 import java.util.Vector;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Echo;
@@ -30,47 +32,58 @@ import org.jnitasks.types.AbstractFeature;
 public class MakeTask extends Task {
     private static final String cmd = "make";
 
-    private boolean force = false;
     private File dir = null;
-    private String debug = null;
-    private boolean override = false;
-    private File makefile = null;
-    private boolean ignoreErrors = false;
+
     private Integer jobs = null;
+
+    @Setter
+    private boolean force = false;
+
+    @Setter
+    private String debug = null;
+
+    @Setter
+    private boolean override = false;
+
+    @Setter
+    private File makefile = null;
+
+    @Setter
+    private boolean ignoreErrors = false;
+
+    @Setter
     private boolean keepGoing = false;
+
+    @Setter
     private Float load = null;
+
+    @Setter
     private boolean quiet = false;
+
+    @Setter
     private boolean touch = false;
+
+    @Setter
     private boolean printDirectory = false;
+
+    @Setter
     private String target = null;
 
-    private Vector<MakeTask.Include> features = new Vector<MakeTask.Include>();
-    private List<Environment.Variable> env = new Vector<Environment.Variable>();
+    private final Vector<MakeTask.Include> include = new Vector<>();
+    private final List<Environment.Variable> env = new Vector<>();
 
-    public void setForce(boolean force) {
-        this.force = force;
-    }
-
+    @SuppressWarnings("unused")
     public void setDir(File dir) {
+        if (!dir.exists() && !dir.mkdir()) {
+            throw new BuildException("Failed to create build directory.");
+        } else if (!dir.isDirectory()) {
+            throw new BuildException("Invalid build directory.");
+        }
+
         this.dir = dir;
     }
 
-    public void setDebug(String debug) {
-        this.debug = debug;
-    }
-
-    public void setOverride(boolean override) {
-        this.override = override;
-    }
-
-    public void setMakefile(File makefile) {
-        this.makefile = makefile;
-    }
-
-    public void setIgnoreerrors(boolean ignoreErrors) {
-        this.ignoreErrors = ignoreErrors;
-    }
-
+    @SuppressWarnings("unused")
     public void setJobs(String jobs) {
         if (jobs.equalsIgnoreCase("auto")) {
             this.jobs = Runtime.getRuntime().availableProcessors();
@@ -83,30 +96,7 @@ public class MakeTask extends Task {
         }
     }
 
-    public void setKeepgoing(boolean keepGoing) {
-        this.keepGoing = keepGoing;
-    }
-
-    public void setLoad(float jobs) {
-        this.load = new Float(jobs);
-    }
-
-    public void setQuiet(boolean quiet) {
-        this.quiet = quiet;
-    }
-
-    public void setTouch(boolean touch) {
-        this.touch = touch;
-    }
-
-    public void setPrintdirectory(boolean printDirectory) {
-        this.printDirectory = printDirectory;
-    }
-
-    public void setTarget(String target) {
-        this.target = target.replaceAll(",", " ");
-    }
-
+    @SuppressWarnings("unused")
     public void addEnv(Environment.Variable var) {
         this.env.add(var);
     }
@@ -119,27 +109,27 @@ public class MakeTask extends Task {
         command.append(MakeTask.cmd);
 
         if (force) {
-            command.append(" -B");
+            command.append(" --always-make");
         }
 
         if (debug != null) {
+            command.append(" --debug");
+
             if (debug.trim().length() > 0) {
-                command.append(" --debug=").append(debug);
-            } else {
-                command.append(" -d");
+                command.append("=").append(debug);
             }
         }
 
         if (override) {
-            command.append(" -e");
+            command.append(" --environment-overrides");
         }
 
         if (quiet) {
-            command.append(" -s");
+            command.append(" --quiet");
         }
 
         if (makefile != null) {
-            command.append(" -f ");
+            command.append(" --makefile=");
             // TODO Change to getCanonicalPath() when ready to deal with the io exception.
             // TODO Make sure the drive letter is lower case.
             String tmpPath = makefile.getAbsolutePath().replace('\\', '/');
@@ -151,31 +141,45 @@ public class MakeTask extends Task {
         }
 
         if (ignoreErrors) {
-            command.append(" -i");
+            command.append(" --ignore-errors");
         }
 
         if (jobs != null) {
-            command.append(" -j ").append(jobs);
+            command.append(" --jobs=").append(jobs);
         }
 
         if (keepGoing) {
-            command.append(" -k");
+            command.append(" --keep-going");
         }
 
         if (load != null) {
-            command.append(" -l ").append(load);
+            command.append(" --load-average=").append(load);
         }
 
         if (quiet) {
-            command.append(" -s");
+            command.append(" --quiet");
         }
 
         if (touch) {
-            command.append(" -t");
+            command.append(" -touch");
         }
 
         if (printDirectory) {
-            command.append(" -w");
+            command.append(" --print-directory");
+        }
+
+        // Include arguments for nested Include.
+        for (MakeTask.Include inc : this.include) {
+            if (inc.isIfConditionValid() && inc.isUnlessConditionValid()) {
+                command.append(" --include-dir=");
+
+                String path = inc.getPath().replace('\\', '/');
+                if (path.contains(" ")) {
+                    path = '"' + path + '"';
+                }
+
+                command.append(path);
+            }
         }
 
         if (target != null) {
@@ -195,8 +199,8 @@ public class MakeTask extends Task {
         shell.setTaskName(this.getTaskName());
 
         // Environment.Variable arguments for nested env items.
-        for (Environment.Variable variable : env) {
-            shell.addEnv(variable);
+        for (Environment.Variable var : this.env) {
+            shell.addEnv(var);
         }
 
         shell.setDir(dir);
@@ -217,14 +221,8 @@ public class MakeTask extends Task {
 
 
     public static class Include extends AbstractFeature implements Cloneable {
+        @Getter
+        @Setter
         private String path;
-
-        public void setPath(String path) {
-            this.path = path;
-        }
-
-        public String getPath() {
-            return this.path;
-        }
     }
 }

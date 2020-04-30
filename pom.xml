@@ -1,7 +1,7 @@
 <!--
 JNITasks: Ant tasks for JNI projects.
 Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
-https://github.com/kwhat/jnitasks/
+https://github.com/kwhat/ant-jni-tasks/
 
 JNITasks is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published
@@ -48,6 +48,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant-testutil</artifactId>
+      <version>1.10.7</version>
       <scope>test</scope>
     </dependency>
 
@@ -106,6 +113,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </executions>
       </plugin-->
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.9</version>
+
+        <configuration>
+          <systemPropertyVariables>
+            <project.build.testOutputDirectory>${project.build.testOutputDirectory}</project.build.testOutputDirectory>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>

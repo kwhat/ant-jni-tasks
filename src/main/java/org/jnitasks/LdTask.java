@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -19,7 +19,10 @@ package org.jnitasks;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.apache.tools.ant.taskdefs.ExecTask;
@@ -30,35 +33,16 @@ import org.jnitasks.toolchains.ToolchainFactory;
 import org.jnitasks.types.AbstractFeature;
 
 public class LdTask extends MatchingTask {
+    @Setter
     private String toolchain = "gcc";
 
-    private File outFile = null;
+    @Setter
+    private File outFile;
 
-    private String host = "";
+    @Setter
+    private String host;
 
-    private Vector<AbstractFeature> features = new Vector<AbstractFeature>();
-
-
-    public void setOutfile(File outFile) {
-        this.outFile = outFile;
-    }
-
-    public void setToolchain(String toolchain) {
-        this.toolchain = toolchain;
-    }
-
-    public void setHost(String host) {
-        if (host == null) {
-            this.host = "";
-        } else {
-            this.host = host;
-        }
-    }
-
-    public String getHost() {
-        return this.host;
-    }
-
+    private final List<AbstractFeature> features = new Vector<>();
 
     public void addFileset(FileSet fileset) {
         // Wrap FileSet to allow for argument order.
@@ -150,47 +134,24 @@ public class LdTask extends MatchingTask {
     }
 
     public static class Argument extends AbstractFeature {
+        @Getter
+        @Setter
         private String value;
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
     }
 
     public static class Library extends AbstractFeature {
+        @Getter
+        @Setter
         private File path;
+
+        @Getter
+        @Setter
         private String lib;
-
-        public void setPath(File path) {
-            this.path = path;
-        }
-
-        public File getPath() {
-            return this.path;
-        }
-
-        public void setLib(String lib) {
-            this.lib = lib;
-        }
-
-        public String getLib() {
-            return lib;
-        }
     }
 
     public static class FileSetArgument extends AbstractFeature {
-        private FileSet files;
-
-        public void setFileSet(FileSet files) {
-            this.files = files;
-        }
-
-        public FileSet getFileSet() {
-            return this.files;
-        }
+        @Getter
+        @Setter
+        private FileSet fileSet;
     }
 }

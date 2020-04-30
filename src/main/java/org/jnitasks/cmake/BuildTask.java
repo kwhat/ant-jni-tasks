@@ -1,6 +1,6 @@
 /* JNITasks: Ant tasks for JNI projects.
  * Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
- * https://github.com/kwhat/jnitasks/
+ * https://github.com/kwhat/ant-jni-tasks/
  *
  * JNITasks is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,6 +18,7 @@
 package org.jnitasks.cmake;
 
 import java.io.File;
+import lombok.Setter;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
@@ -27,14 +28,22 @@ public class BuildTask extends Task {
 
     private int jobs = Runtime.getRuntime().availableProcessors();
 
+    @Setter
     private File dir = null;
 
+    @Setter
     private String config = null;
+
+    @Setter
     private String target = null;
 
+    @Setter
     private boolean clean = false;
+
+    @Setter
     private boolean verbose = true;
 
+    @SuppressWarnings("unused")
     public void setJobs(String jobs) {
         if (jobs.equalsIgnoreCase("auto")) {
             this.jobs = Runtime.getRuntime().availableProcessors();
@@ -44,32 +53,13 @@ public class BuildTask extends Task {
         }
     }
 
-    public void setDir(File dir) {
-        this.dir = dir;
-    }
-
-    public void setConfig(String config) {
-        this.config = config;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    public void setClean(boolean clean) {
-        this.clean = clean;
-    }
-
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
     @Override
     public void execute() throws BuildException {
         // Set the command to execute along with any required arguments.
         StringBuilder command = new StringBuilder(BuildTask.cmd);
         command
             .append(" --build")
+            .append(" .")
             .append(" --parallel ")
             .append(jobs);
 
@@ -97,9 +87,18 @@ public class BuildTask extends Task {
         shell.setTaskName(this.getTaskName());
 
         shell.setDir(dir);
-        shell.setExecutable(command.toString());
         shell.setFailonerror(true);
 
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            shell.setExecutable("cmd");
+            shell.createArg().setValue("/c");
+        } else {
+            shell.setExecutable("sh");
+            shell.createArg().setValue("-c");
+        }
+
+        shell.createArg().setValue(command.toString());
+        
         shell.execute();
     }
 }

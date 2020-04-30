@@ -1,4 +1,4 @@
-[JNITasks](https://github.com/kwhat/jnitasks/) - Ant Tasks for JNI Projects
+[JNITasks](https://github.com/kwhat/ant-jni-tasks/) - Ant Tasks for JNI Projects
 ===========================================================================
 
 ## Configure Task
