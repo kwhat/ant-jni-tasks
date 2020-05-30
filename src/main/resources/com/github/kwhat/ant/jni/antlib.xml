@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<!--
+JNITasks: Ant tasks for JNI projects.
+Copyright (C) 2013-2020 Alexander Barker.  All Rights Received.
+https://github.com/kwhat/ant-jni-tasks/
+
+JNITasks is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+JNITasks is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<antlib>
+  <typedef name="autoreconf" classname="com.github.kwhat.ant.jni.autotools.AutoreconfTask"/>
+  <typedef name="configure" classname="com.github.kwhat.ant.jni.autotools.ConfigureTask"/>
+  <typedef name="make" classname="com.github.kwhat.ant.jni.autotools.MakeTask"/>
+
+  <typedef name="build" classname="com.github.kwhat.ant.jni.cmake.BuildTask"/>
+  <typedef name="generate" classname="com.github.kwhat.ant.jni.cmake.GenerateTask"/>
+
+  <typedef name="pkgconfig" classname="com.github.kwhat.ant.jni.pkgconfig.PkgConfigTask"/>
+
+  <typedef name="cc" classname="com.github.kwhat.ant.jni.CcTask"/>
+  <typedef name="ld" classname="com.github.kwhat.ant.jni.LdTask"/>
+</antlib>

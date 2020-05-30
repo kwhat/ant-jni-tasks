@@ -43,6 +43,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </license>
   </licenses>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/kwhat/ant-jni-tasks</url>
+    </repository>
+  </distributionManagement>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
