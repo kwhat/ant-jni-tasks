@@ -5,7 +5,7 @@ on:
       - master
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,12 +22,14 @@ jobs:
 
       - name: Build
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn -B --no-transfer-progress deploy
           mvn versions:display-plugin-updates
+          mvn -B --no-transfer-progress deploy
 
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
-          name: nightly-jars
+          name: nightly-build
           path: ${{github.workspace}}/target/*.jar
