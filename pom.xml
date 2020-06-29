@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   <groupId>com.github.kwhat</groupId>
   <artifactId>ant-jni-tasks</artifactId>
   <version>0.4-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <properties>
     <maven.compiler.source>8</maven.compiler.source>
