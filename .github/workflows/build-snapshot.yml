@@ -1,11 +1,11 @@
-name: Nightly Build
+name: Build Snapshot
 on:
   push:
     branches:
       - master
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,13 +19,17 @@ jobs:
           java-version: 11
           java-package: jdk
           architecture: x64
+          server-id: ossrh-snapshots
+          server-username: MAVEN_CENTRAL_USER
+          server-password: MAVEN_CENTRAL_TOKEN
 
       - name: Build
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
         run: |
-          mvn versions:display-plugin-updates
+          mvn -B --no-transfer-progress versions:display-plugin-updates
           mvn -B --no-transfer-progress deploy
 
       - name: Upload
